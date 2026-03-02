@@ -1,0 +1,58 @@
+ID,Date,Type,Category,Description,Amount,Notes
+s001,2026-01-02,income,Salary,January Salary - Acme Corp,2850.00,Net pay after tax
+s002,2026-01-03,expense,Housing,Rent - 14 Maple Street,875.00,Monthly rent
+s003,2026-01-03,expense,Utilities,Thames Water - January,42.50,Water bill
+s004,2026-01-04,expense,Groceries,Tesco Weekly Shop,67.34,Weekly groceries
+s005,2026-01-05,expense,Transport,Oyster Card Top-up,60.00,Monthly travel
+s006,2026-01-06,expense,Subscriptions,Netflix Monthly,10.99,Standard plan
+s007,2026-01-06,expense,Subscriptions,Spotify Premium,10.99,
+s008,2026-01-07,expense,Dining Out,Pizza Express with friends,24.50,Birthday dinner for Sam
+s009,2026-01-10,expense,Groceries,Sainsbury's midweek top-up,23.18,
+s010,2026-01-11,expense,Shopping,Amazon - Wireless Earbuds,34.99,Replacement pair
+s011,2026-01-12,expense,Health,Boots Pharmacy,12.80,Vitamins and cold medicine
+s012,2026-01-14,expense,Entertainment,Vue Cinema - 2 tickets,22.00,Watched Dune Part Three
+s013,2026-01-15,income,Freelance,Logo design for Bright Cafe,350.00,Freelance side project
+s014,2026-01-16,expense,Groceries,Aldi Weekly Shop,52.47,
+s015,2026-01-18,expense,Utilities,British Gas - Electricity,78.30,Winter quarter
+s016,2026-01-19,expense,Dining Out,Wagamama lunch,16.90,
+s017,2026-01-20,expense,Education,Udemy Course - Python,12.99,On sale
+s018,2026-01-22,expense,Groceries,Tesco Express - essentials,18.65,Milk bread eggs
+s019,2026-01-24,expense,Transport,Uber to Heathrow,38.50,Airport run
+s020,2026-01-25,expense,Shopping,Uniqlo - Winter jacket,59.90,Sale item
+s021,2026-01-27,expense,Groceries,Lidl big shop,71.22,Monthly stock-up
+s022,2026-01-28,expense,Utilities,Vodafone Mobile,25.00,Monthly contract
+s023,2026-01-29,expense,Entertainment,Kindle Book - Atomic Habits,8.99,
+s024,2026-01-30,income,Investments,Dividend - Vanguard ISA,45.20,Quarterly dividend
+s025,2026-01-31,expense,Housing,Council Tax - January,148.00,Band C
+s026,2026-02-01,income,Salary,February Salary - Acme Corp,2850.00,Net pay after tax
+s027,2026-02-02,expense,Housing,Rent - 14 Maple Street,875.00,Monthly rent
+s028,2026-02-03,expense,Utilities,Thames Water - February,42.50,
+s029,2026-02-04,expense,Groceries,Tesco Weekly Shop,58.91,
+s030,2026-02-05,expense,Transport,Oyster Card Top-up,60.00,
+s031,2026-02-06,expense,Subscriptions,Netflix Monthly,10.99,
+s032,2026-02-06,expense,Subscriptions,Spotify Premium,10.99,
+s033,2026-02-07,expense,Dining Out,Nando's with colleagues,19.75,Team lunch
+s034,2026-02-08,expense,Shopping,Waterstones - 3 books,27.50,Book club picks
+s035,2026-02-10,expense,Groceries,Sainsbury's midweek,19.44,
+s036,2026-02-12,expense,Health,GP Co-pay and prescriptions,9.90,
+s037,2026-02-13,expense,Dining Out,"Valentine's dinner - The Ivy",89.00,Special occasion
+s038,2026-02-14,expense,Shopping,"Valentine's gift - flowers",35.00,
+s039,2026-02-15,income,Freelance,Website update for Bright Cafe,200.00,
+s040,2026-02-16,expense,Groceries,Aldi Weekly Shop,48.33,
+s041,2026-02-18,expense,Utilities,British Gas - Electricity,72.10,
+s042,2026-02-19,expense,Entertainment,Spotify Concert tickets,45.00,Live gig in March
+s043,2026-02-20,expense,Transport,Train to Manchester,56.00,Return ticket
+s044,2026-02-21,expense,Groceries,Tesco Express,14.20,Quick top-up
+s045,2026-02-22,expense,Education,Skillshare Annual Plan,32.00,Paid yearly
+s046,2026-02-24,expense,Utilities,Vodafone Mobile,25.00,
+s047,2026-02-25,expense,Groceries,Lidl big shop,63.88,
+s048,2026-02-26,expense,Housing,Council Tax - February,148.00,
+s049,2026-02-27,expense,Entertainment,PS5 Game - Elden Ring DLC,34.99,
+s050,2026-02-28,income,Gifts,Birthday money from Gran,50.00,
+s051,2026-03-01,income,Salary,March Salary - Acme Corp,2950.00,Pay rise effective March
+s052,2026-03-01,expense,Housing,Rent - 14 Maple Street,875.00,
+s053,2026-03-02,expense,Utilities,Thames Water - March,42.50,
+s054,2026-03-02,expense,Groceries,Tesco Weekly Shop,72.15,Stocked up for the week
+s055,2026-03-02,expense,Transport,Oyster Card Top-up,60.00,
+s056,2026-03-02,expense,Subscriptions,Netflix Monthly,10.99,
+s057,2026-03-02,expense,Subscriptions,Spotify Premium,10.99,

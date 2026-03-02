@@ -1,0 +1,25 @@
+Month,Type,Category,Value
+2026-01,overall,,1800.00
+2026-01,category,Housing,1050.00
+2026-01,category,Groceries,250.00
+2026-01,category,Transport,120.00
+2026-01,category,Dining Out,60.00
+2026-01,category,Utilities,160.00
+2026-01,category,Entertainment,50.00
+2026-01,category,Subscriptions,30.00
+2026-02,overall,,1800.00
+2026-02,category,Housing,1050.00
+2026-02,category,Groceries,250.00
+2026-02,category,Transport,120.00
+2026-02,category,Dining Out,60.00
+2026-02,category,Utilities,160.00
+2026-02,category,Entertainment,50.00
+2026-02,category,Subscriptions,30.00
+2026-03,overall,,1800.00
+2026-03,category,Housing,1050.00
+2026-03,category,Groceries,280.00
+2026-03,category,Transport,120.00
+2026-03,category,Dining Out,60.00
+2026-03,category,Utilities,160.00
+2026-03,category,Entertainment,50.00
+2026-03,category,Subscriptions,30.00
