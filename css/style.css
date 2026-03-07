@@ -894,37 +894,88 @@ select {
   gap: 10px;
   flex-wrap: wrap;
 }
-
-/* Challenge Calendar */
+/* --- 365 Challenge (Real Calendar) --- */
 .challenge-calendar {
-  display: grid;
-  grid-template-columns: repeat(20, 1fr);
-  gap: 3px;
   margin: 16px 0;
+}
+
+.months-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.calendar-month {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.month-title {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.weekday-header {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 .challenge-day {
   aspect-ratio: 1;
-  border-radius: 2px;
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.6rem;
+  font-size: 0.8rem;
   font-weight: 500;
   cursor: default;
   border: 1px solid transparent;
   position: relative;
+  transition: transform 0.2s;
+}
+
+.challenge-day:hover:not(.empty):not(.out-of-bounds) {
+  transform: scale(1.1);
+  z-index: 10;
+}
+
+.challenge-day.empty {
+  background: transparent;
+  border: none;
+}
+
+.challenge-day.out-of-bounds {
+  color: var(--text-muted);
+  opacity: 0.3;
 }
 
 .challenge-day.saved {
   background: var(--accent);
   color: #fff;
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.3);
 }
 
 .challenge-day.today {
   border: 2px solid var(--primary);
   background: var(--bg-alt);
   font-weight: 700;
+  color: var(--primary);
 }
 
 .challenge-day.upcoming {
@@ -941,26 +992,11 @@ select {
   display: flex;
   gap: 16px;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
+  margin-top: 24px;
+  flex-wrap: wrap;
 }
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.legend-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
-
-.legend-dot.saved { background: var(--accent); }
-.legend-dot.today { background: var(--bg-alt); border: 2px solid var(--primary); }
-.legend-dot.upcoming { background: var(--bg-alt); }
-.legend-dot.missed { background: #fee2e2; }
 
 /* --- Settings --- */
 .settings-section {

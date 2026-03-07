@@ -1197,34 +1197,91 @@
     renderChallengeCalendar(ch);
   }
 
-  function renderChallengeCalendar(ch) {
+function renderChallengeCalendar(ch) {
     const container = document.getElementById('challengeCalendar');
     if (!ch) {
-      container.innerHTML = '<div class="chart-empty">Start the challenge to see your progress calendar</div>';
+      container.innerHTML = '<div class="chart-empty" style="min-height:200px">Start the challenge to see your progress calendar</div>';
       return;
     }
 
     const startDate = new Date(ch.startDate);
+    startDate.setHours(0,0,0,0);
     const today = new Date();
     today.setHours(0,0,0,0);
-    startDate.setHours(0,0,0,0);
-    const daysSinceStart = Math.floor((today - startDate) / 86400000);
     const savedDays = ch.savedDays || [];
 
-    let html = '';
-    for (let d = 1; d <= 365; d++) {
-      let cls = 'challenge-day ';
-      const isCurrent = d === daysSinceStart + 1;
-      const isPast = d <= daysSinceStart;
-      const isSaved = savedDays.includes(d);
+    // 计算挑战的结束日期 (365天后)
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 364);
 
-      if (isSaved) cls += 'saved';
-      else if (isCurrent) cls += 'today';
-      else if (isPast) cls += 'missed';
-      else cls += 'upcoming';
+    // 确定需要渲染的月份范围
+    let currentMonthDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    const endMonthDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
 
-      html += `<div class="${cls}" title="Day ${d}: ${d}p${isSaved ? ' ✓' : ''}">${d}</div>`;
+    let html = '<div class="months-wrapper">';
+    const weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+
+    // 循环生成每一个月的日历
+    while (currentMonthDate <= endMonthDate) {
+      const year = currentMonthDate.getFullYear();
+      const month = currentMonthDate.getMonth();
+      const monthName = currentMonthDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+      html += `<div class="calendar-month">`;
+      html += `<h4 class="month-title">${monthName}</h4>`;
+      html += `<div class="month-grid">`;
+
+      // 星期表头
+      weekdays.forEach(wd => {
+        html += `<div class="weekday-header">${wd}</div>`;
+      });
+
+      // 计算这个月的第一天是星期几 (0是星期日，转换为 1-7，星期一为1)
+      let firstDayIndex = new Date(year, month, 1).getDay();
+      firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1; 
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      // 填充前面的空白天数
+      for (let i = 0; i < firstDayIndex; i++) {
+        html += `<div class="challenge-day empty"></div>`;
+      }
+
+      // 渲染这个月的每一天
+      for (let d = 1; d <= daysInMonth; d++) {
+        const iterDate = new Date(year, month, d);
+        iterDate.setHours(0,0,0,0);
+
+        // 计算这一天是挑战的第几天
+        const daysSinceStart = Math.floor((iterDate - startDate) / 86400000);
+        const challengeDayNum = daysSinceStart + 1;
+
+        // 判断这一天是否在 365 天的挑战范围内
+        if (challengeDayNum >= 1 && challengeDayNum <= 365) {
+          let cls = 'challenge-day ';
+          const isToday = (iterDate.getTime() === today.getTime());
+          const isPast = (iterDate < today);
+          const isSaved = savedDays.includes(challengeDayNum);
+
+          if (isSaved) cls += 'saved';
+          else if (isToday) cls += 'today';
+          else if (isPast) cls += 'missed';
+          else cls += 'upcoming';
+
+          const displayDate = iterDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+          html += `<div class="${cls}" title="${displayDate} - Day ${challengeDayNum}: ${challengeDayNum}p${isSaved ? ' ✓' : ''}">${d}</div>`;
+        } else {
+          // 不在挑战范围内的日期（变成半透明）
+          html += `<div class="challenge-day out-of-bounds">${d}</div>`;
+        }
+      }
+
+      html += `</div></div>`;
+      // 进入下一个月
+      currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
     }
+
+    html += '</div>';
     container.innerHTML = html;
   }
 
