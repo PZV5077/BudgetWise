@@ -1,0 +1,847 @@
+/* ============================================================
+   BudgeWise Login Page Styles
+   Premium dark glassmorphism design
+   ============================================================ */
+
+/* ---------- Reset & Base ---------- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+/* ---------- Background ---------- */
+.login-bg {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 40%, #0d1b2a 100%);
+  z-index: 0;
+}
+
+/* Animated floating particles */
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  font-size: 1.4rem;
+  opacity: 0;
+  animation: floatUp linear infinite;
+  color: rgba(255, 255, 255, .12);
+  filter: blur(0.5px);
+  user-select: none;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(100vh) rotate(0deg) scale(.7);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-10vh) rotate(360deg) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Ambient glow orbs */
+.glow-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: .18;
+  z-index: 0;
+  animation: orbDrift 12s ease-in-out infinite alternate;
+}
+
+.glow-orb.orb-1 {
+  width: 420px;
+  height: 420px;
+  background: #2563eb;
+  top: -80px;
+  left: -60px;
+}
+
+.glow-orb.orb-2 {
+  width: 360px;
+  height: 360px;
+  background: #059669;
+  bottom: -100px;
+  right: -80px;
+  animation-delay: -5s;
+}
+
+.glow-orb.orb-3 {
+  width: 280px;
+  height: 280px;
+  background: #7c3aed;
+  top: 50%;
+  left: 60%;
+  animation-delay: -8s;
+}
+
+@keyframes orbDrift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate(30px, -40px) scale(1.12);
+  }
+}
+
+/* ---------- Layout ---------- */
+.login-wrapper {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+/* ---------- Glass Card ---------- */
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, .06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 24px;
+  padding: 48px 40px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, .35),
+    inset 0 1px 0 rgba(255, 255, 255, .08);
+  transition: transform .4s ease, box-shadow .4s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.login-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, .45),
+    inset 0 1px 0 rgba(255, 255, 255, .1);
+}
+
+/* Shine sweep on card */
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(to bottom right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, .03) 40%,
+      rgba(255, 255, 255, 0) 60%);
+  transform: rotate(-45deg);
+  pointer-events: none;
+}
+
+/* ---------- Logo ---------- */
+.login-logo {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.login-logo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #2563eb, #059669);
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, .35);
+  margin-bottom: 12px;
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 4px 20px rgba(37, 99, 235, .35);
+  }
+
+  50% {
+    box-shadow: 0 4px 30px rgba(37, 99, 235, .55), 0 0 40px rgba(5, 150, 105, .2);
+  }
+}
+
+.login-logo-text {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.5px;
+}
+
+.login-tagline {
+  display: block;
+  font-size: 14px;
+  color: rgba(255, 255, 255, .5);
+  margin-top: 4px;
+}
+
+/* ---------- Steps container ---------- */
+.login-steps {
+  position: relative;
+  overflow: hidden;
+}
+
+.login-step {
+  display: none;
+  animation: fadeSlideIn .5s ease forwards;
+}
+
+.login-step.active {
+  display: block;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+}
+
+/* ---------- Step 1: Login Form ---------- */
+.login-heading {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-heading h1 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.login-heading p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, .45);
+}
+
+/* Form groups */
+.form-group-login {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group-login label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, .65);
+  margin-bottom: 8px;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.input-wrap .input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, .3);
+  pointer-events: none;
+  font-size: 16px;
+  transition: color .25s;
+}
+
+.input-wrap input {
+  width: 100%;
+  padding: 14px 14px 14px 44px;
+  background: rgba(255, 255, 255, .06);
+  border: 1.5px solid rgba(255, 255, 255, .1);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #fff;
+  outline: none;
+  transition: border-color .25s, background .25s, box-shadow .25s;
+}
+
+.input-wrap input::placeholder {
+  color: rgba(255, 255, 255, .25);
+}
+
+.input-wrap input:focus {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, .08);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+}
+
+.input-wrap input:focus~.input-icon {
+  color: #2563eb;
+}
+
+/* Password toggle */
+.pw-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, .35);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: color .2s;
+}
+
+.pw-toggle:hover {
+  color: rgba(255, 255, 255, .7);
+}
+
+/* Error message */
+.form-error {
+  font-size: 12px;
+  color: #f87171;
+  margin-top: 6px;
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-error.visible {
+  display: flex;
+}
+
+/* Shake animation for errors */
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  50%,
+  90% {
+    transform: translateX(-6px);
+  }
+
+  30%,
+  70% {
+    transform: translateX(6px);
+  }
+}
+
+.shake {
+  animation: shake .45s ease;
+}
+
+/* Sign in button */
+.btn-signin {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform .15s, box-shadow .25s;
+  margin-top: 8px;
+}
+
+.btn-signin:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, .35);
+}
+
+.btn-signin:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, .25);
+}
+
+/* Ripple on button */
+.btn-signin::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, .25) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity .4s;
+}
+
+.btn-signin:hover::after {
+  opacity: 1;
+}
+
+/* Loading spinner inside button */
+.btn-signin .spinner {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, .3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  margin: 0 auto;
+}
+
+.btn-signin.loading .btn-text {
+  visibility: hidden;
+}
+
+.btn-signin.loading .spinner {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -10px 0 0 -10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Forgot / Remember */
+.form-extras {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, .5);
+  cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.forgot-link {
+  font-size: 13px;
+  color: #60a5fa;
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.forgot-link:hover {
+  color: #93bbfc;
+}
+
+/* Divider */
+.login-divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0 16px;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, .1);
+}
+
+.login-divider span {
+  padding: 0 14px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, .3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+/* Sign up prompt */
+.signup-prompt {
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, .45);
+}
+
+.signup-link {
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color .2s;
+}
+
+.signup-link:hover {
+  color: #93bbfc;
+}
+
+/* ---------- Step 2: Duo Mobile 2FA ---------- */
+.duo-step {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.duo-step h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.duo-step .duo-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, .45);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+/* Phone mockup */
+.duo-phone {
+  position: relative;
+  width: 140px;
+  height: 240px;
+  margin: 0 auto 28px;
+  background: linear-gradient(145deg, #1e1e3a, #2a2a4a);
+  border-radius: 24px;
+  border: 2px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+  overflow: hidden;
+}
+
+.duo-phone-screen {
+  position: absolute;
+  inset: 10px 8px;
+  background: #111128;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.duo-phone-notch {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 5px;
+  background: rgba(255, 255, 255, .15);
+  border-radius: 3px;
+}
+
+/* Notification card on phone */
+.duo-notif {
+  width: 100%;
+  background: rgba(37, 99, 235, .2);
+  border: 1px solid rgba(37, 99, 235, .3);
+  border-radius: 12px;
+  padding: 10px 8px;
+  animation: notifSlide .6s ease .3s both;
+}
+
+@keyframes notifSlide {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.duo-notif-title {
+  font-size: 9px;
+  font-weight: 600;
+  color: #60a5fa;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.duo-notif-body {
+  font-size: 8px;
+  color: rgba(255, 255, 255, .6);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.duo-notif-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.duo-notif-btn {
+  flex: 1;
+  padding: 5px;
+  border: none;
+  border-radius: 6px;
+  font-size: 8px;
+  font-weight: 600;
+  cursor: default;
+  font-family: inherit;
+}
+
+.duo-notif-btn.approve {
+  background: #059669;
+  color: #fff;
+  animation: btnPulseGreen 1.5s ease-in-out infinite;
+}
+
+.duo-notif-btn.deny {
+  background: rgba(255, 255, 255, .1);
+  color: rgba(255, 255, 255, .6);
+}
+
+@keyframes btnPulseGreen {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(5, 150, 105, .4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(5, 150, 105, 0);
+  }
+}
+
+/* Duo waiting indicator */
+.duo-waiting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, .5);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.duo-dots span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2563eb;
+  margin: 0 2px;
+  animation: dotBounce 1.4s ease-in-out infinite;
+}
+
+.duo-dots span:nth-child(2) {
+  animation-delay: .2s;
+}
+
+.duo-dots span:nth-child(3) {
+  animation-delay: .4s;
+}
+
+@keyframes dotBounce {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(.6);
+    opacity: .4;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Countdown timer */
+.duo-timer {
+  font-size: 13px;
+  color: rgba(255, 255, 255, .4);
+  margin-bottom: 24px;
+}
+
+.duo-timer span {
+  font-weight: 600;
+  color: #60a5fa;
+}
+
+/* Duo action links */
+.duo-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.duo-action-btn {
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s, transform .15s;
+  border: none;
+}
+
+.duo-action-btn.resend {
+  background: rgba(37, 99, 235, .15);
+  color: #60a5fa;
+  border: 1px solid rgba(37, 99, 235, .25);
+}
+
+.duo-action-btn.resend:hover {
+  background: rgba(37, 99, 235, .25);
+  transform: translateY(-1px);
+}
+
+.duo-action-btn.alt-method {
+  background: transparent;
+  color: rgba(255, 255, 255, .45);
+}
+
+.duo-action-btn.alt-method:hover {
+  color: rgba(255, 255, 255, .65);
+}
+
+/* ---------- Step 3: Success ---------- */
+.success-step {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.success-check {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #059669, #10b981);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  animation: successPop .5s cubic-bezier(.175, .885, .32, 1.275) both;
+  box-shadow: 0 4px 24px rgba(5, 150, 105, .35);
+}
+
+@keyframes successPop {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.success-check svg {
+  width: 40px;
+  height: 40px;
+  stroke: #fff;
+  stroke-width: 3;
+  fill: none;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: drawCheck .6s ease .3s forwards;
+}
+
+@keyframes drawCheck {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.success-step h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.success-step p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, .45);
+}
+
+/* ---------- Footer ---------- */
+.login-footer {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, .25);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 36px 24px;
+    border-radius: 20px;
+  }
+
+  .login-logo-icon {
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
+  }
+
+  .login-logo-text {
+    font-size: 24px;
+  }
+
+  .login-heading h1 {
+    font-size: 20px;
+  }
+}
