@@ -1,1 +1,1 @@
-# BudgeWise
+# BudgetWise
