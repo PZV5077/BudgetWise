@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — BudgeWise</title>
+  <meta name="description" content="Sign in to BudgeWise, your smart budget tracker. Manage your finances with ease.">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Animated Background -->
+  <div class="login-bg"></div>
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+  <div class="particles" id="particles"></div>
+
+  <!-- Login Card -->
+  <div class="login-wrapper">
+    <div class="login-card">
+
+      <!-- Logo -->
+      <div class="login-logo">
+        <div class="login-logo-icon">£</div>
+        <span class="login-logo-text">BudgeWise</span>
+        <span class="login-tagline">Smart Budget Tracker</span>
+      </div>
+
+      <!-- Steps Container -->
+      <div class="login-steps">
+
+        <!-- Step 1: Login Form -->
+        <div class="login-step active" id="stepLogin">
+          <div class="login-heading">
+            <h1>Welcome back</h1>
+            <p>Sign in to manage your finances</p>
+          </div>
+
+          <form id="loginForm" autocomplete="off">
+            <div class="form-group-login">
+              <label for="username">Username</label>
+              <div class="input-wrap">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </span>
+                <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+              </div>
+            </div>
+
+            <div class="form-group-login">
+              <label for="password">Password</label>
+              <div class="input-wrap">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                  </svg>
+                </span>
+                <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+                <button type="button" class="pw-toggle" id="pwToggle" aria-label="Toggle password visibility">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-error" id="loginError">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span>Error message</span>
+            </div>
+
+            <button type="submit" class="btn-signin" id="signinBtn">
+              <span class="btn-text">Sign In</span>
+              <div class="spinner"></div>
+            </button>
+
+            <div class="form-extras">
+              <label class="remember-me">
+                <input type="checkbox" id="rememberMe">
+                Remember me
+              </label>
+              <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <div class="login-divider">
+              <span>or</span>
+            </div>
+
+            <div class="signup-prompt">
+              Don't have an account? <a href="#" class="signup-link" id="signupLink">Sign Up</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 2: Duo Mobile 2FA -->
+        <div class="login-step duo-step" id="stepDuo">
+          <h2>Two-Factor Authentication</h2>
+          <p class="duo-subtitle">A push notification has been sent to your<br>Duo Mobile app. Please approve to
+            continue.</p>
+
+          <!-- Phone Mockup -->
+          <div class="duo-phone">
+            <div class="duo-phone-notch"></div>
+            <div class="duo-phone-screen">
+              <div class="duo-notif">
+                <div class="duo-notif-title">Duo Mobile</div>
+                <div class="duo-notif-body">BudgeWise is requesting a login verification</div>
+                <div class="duo-notif-actions">
+                  <span class="duo-notif-btn approve">Approve</span>
+                  <span class="duo-notif-btn deny">Deny</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Waiting indicator -->
+          <div class="duo-waiting">
+            <span>Waiting for approval</span>
+            <div class="duo-dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <!-- Timer -->
+          <div class="duo-timer">
+            Request expires in <span id="duoTimerValue">60</span>s
+          </div>
+
+          <!-- Actions -->
+          <div class="duo-actions">
+            <button class="duo-action-btn resend" id="duoResend">Resend Push</button>
+            <button class="duo-action-btn alt-method">Use a different method</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Success -->
+        <div class="login-step success-step" id="stepSuccess">
+          <div class="success-check">
+            <svg viewBox="0 0 24 24">
+              <polyline points="6 12 10 16 18 8" />
+            </svg>
+          </div>
+          <h2>Verified!</h2>
+          <p>Redirecting to your dashboard…</p>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="login-footer">
+        &copy; 2026 BudgeWise. Your money, your control.
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/login.js"></script>
+</body>
+
+</html>
