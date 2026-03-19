@@ -2,6 +2,7 @@
    BudgeWise — Main Application JavaScript
    Pure JS, localStorage + auto CSV persistence
    ============================================ */
+  
 
 (function() {
   'use strict';
@@ -1498,29 +1499,179 @@
     document.getElementById('savingTip').textContent = tip;
   }
 
-  // ─── Initialise ───
-  function init() {
-    loadState();
-    applyTheme(state.theme);
-    initNav();
-    initMonthNavigation();
-    initThemePanel();
-    initTransactionModal();
-    initBudgets();
-    initChallenge();
-    initSettings();
-    initCSV();
-    updateAllMonthDisplays();
-    showRandomTip();
-    refreshDashboard();
+  const API_BASE = 'http://127.0.0.1:5000/api';
 
-    setInterval(showRandomTip, 30000);
-  }
+async function loadTransactionsFromBackend() {
+  try {
+    console.log("Fetching transactions from backend...");
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+    const response = await fetch(`${API_BASE}/transactions`);
+    console.log("Response status:", response.status);
+
+    const rows = await response.json();
+    console.log("Raw backend rows:", rows);
+
+    state.transactions = rows.map(row => ({
+      id: row.ID || row.id || genId(),
+      date: row.Date || row.date || todayStr(),
+      type: (row.Type || row.type || 'expense').toLowerCase(),
+      category: row.Category || row.category || 'Other',
+      description: row.Description || row.description || 'Imported',
+      amount: Math.abs(parseFloat(row.Amount || row.amount || 0)),
+      notes: row.Notes || row.notes || ''
+    })).filter(t => !isNaN(t.amount) && t.amount > 0);
+
+    console.log("Mapped transactions:", state.transactions);
+
+    saveState();
+    return true;
+  } catch (err) {
+    console.error("Failed to load transactions from backend:", err);
+    return false;
   }
+}
+async function loadBudgetsFromBackend() {
+  try {
+    const response = await fetch(`${API_BASE}/budgets`);
+    const rows = await response.json();
+
+    const budgets = {};
+    rows.forEach(row => {
+      const mk = row.Month || row.month;
+      const type = row.Type || row.type;
+      const cat = row.Category || row.category || '';
+      const val = parseFloat(row.Value || row.value || 0);
+
+      if (!mk || isNaN(val)) return;
+      if (!budgets[mk]) budgets[mk] = { overall: 0, categories: {} };
+
+      if (type === 'overall') {
+        budgets[mk].overall = val;
+      } else if (type === 'category' && cat) {
+        budgets[mk].categories[cat] = val;
+      }
+    });
+
+    state.budgets = budgets;
+    saveState();
+    return true;
+  } catch (err) {
+    console.error("Failed to load budgets from backend:", err);
+    return false;
+  }
+}
+
+async function loadCategoriesFromBackend() {
+  try {
+    const response = await fetch(`${API_BASE}/categories`);
+    const rows = await response.json();
+
+    const expense = [];
+    const income = [];
+
+    rows.forEach(row => {
+      const type = (row.Type || row.type || '').toLowerCase();
+      const name = row.Name || row.name;
+      if (!name) return;
+
+      if (type === 'expense') expense.push(name);
+      if (type === 'income') income.push(name);
+    });
+
+    if (expense.length) state.expenseCategories = expense;
+    if (income.length) state.incomeCategories = income;
+
+    saveState();
+    return true;
+  } catch (err) {
+    console.error("Failed to load categories from backend:", err);
+    return false;
+  }
+}
+
+async function loadSettingsFromBackend() {
+  try {
+    const response = await fetch(`${API_BASE}/settings`);
+    const rows = await response.json();
+
+    const settings = {};
+    rows.forEach(row => {
+      const key = row.Key || row.key;
+      const value = row.Value || row.value;
+      if (key) settings[key] = value;
+    });
+
+    if (settings.theme_primary) {
+      state.theme = {
+        primary: settings.theme_primary,
+        accent: settings.theme_accent || '#059669',
+        bg: settings.theme_bg || '#f8f9fa',
+        card: settings.theme_card || '#ffffff',
+        text: settings.theme_text || '#1a1a2e'
+      };
+    }
+
+    saveState();
+    return true;
+  } catch (err) {
+    console.error("Failed to load settings from backend:", err);
+    return false;
+  }
+}
+
+async function loadChallengeFromBackend() {
+  try {
+    const response = await fetch(`${API_BASE}/challenge`);
+    const rows = await response.json();
+
+    if (rows.length > 0) {
+      const row = rows[0];
+      state.challenge = {
+        startDate: row.StartDate || row.startDate || null,
+        savedDays: (row.SavedDays || row.savedDays || '')
+          .toString()
+          .split(';')
+          .filter(Boolean)
+          .map(Number),
+        withdrawn: String(row.Withdrawn || row.withdrawn || '').toLowerCase() === 'true'
+      };
+    }
+
+    saveState();
+    return true;
+  } catch (err) {
+    console.error("Failed to load challenge from backend:", err);
+    return false;
+  }
+}
+
+
+
+async function init() {
+  loadState();
+
+  await loadTransactionsFromBackend();
+
+  applyTheme(state.theme);
+  initNav();
+  initMonthNavigation();
+  initThemePanel();
+  initTransactionModal();
+  initBudgets();
+  initChallenge();
+  initSettings();
+  initCSV();
+  updateAllMonthDisplays();
+  showRandomTip();
+  refreshDashboard();
+
+  setInterval(showRandomTip, 30000);
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
 
 })();
