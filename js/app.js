@@ -1499,9 +1499,104 @@
     document.getElementById('savingTip').textContent = tip;
   }
 
-  const API_BASE = 'http://127.0.0.1:5000/api';
+  // When deployed as a static site there may be no backend server available.
+  // Use the backend if it exists on the same origin, otherwise try loading from the
+  // shipped sample_data CSV files.
+  const API_BASE = (window.location.protocol === 'file:')
+    ? null
+    : `${window.location.origin}/api`;
+  const SAMPLE_DATA_BASE = 'sample_data';
+
+  async function fetchText(url) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      return await res.text();
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function isDefaultTheme(theme) {
+    return (
+      theme.primary === THEME_PRESETS.default.primary &&
+      theme.accent === THEME_PRESETS.default.accent &&
+      theme.bg === THEME_PRESETS.default.bg &&
+      theme.card === THEME_PRESETS.default.card &&
+      theme.text === THEME_PRESETS.default.text
+    );
+  }
+
+  async function loadSampleData() {
+    const paths = {
+      transactions: `${SAMPLE_DATA_BASE}/${CSV_FILES.transactions}`,
+      budgets: `${SAMPLE_DATA_BASE}/${CSV_FILES.budgets}`,
+      challenge: `${SAMPLE_DATA_BASE}/${CSV_FILES.challenge}`,
+      categories: `${SAMPLE_DATA_BASE}/${CSV_FILES.categories}`,
+      settings: `${SAMPLE_DATA_BASE}/${CSV_FILES.settings}`
+    };
+
+    const [transText, budgetsText, challengeText, catsText, settingsText] = await Promise.all([
+      fetchText(paths.transactions),
+      fetchText(paths.budgets),
+      fetchText(paths.challenge),
+      fetchText(paths.categories),
+      fetchText(paths.settings)
+    ]);
+
+    let updated = false;
+
+    if (!state.transactions.length && transText) {
+      const trans = csvToTransactions(transText);
+      if (trans) {
+        state.transactions = trans;
+        updated = true;
+      }
+    }
+
+    if (!Object.keys(state.budgets).length && budgetsText) {
+      const budgets = csvToBudgets(budgetsText);
+      if (budgets) {
+        state.budgets = budgets;
+        updated = true;
+      }
+    }
+
+    if (!state.challenge && challengeText) {
+      const challenge = csvToChallenge(challengeText);
+      if (challenge) {
+        state.challenge = challenge;
+        updated = true;
+      }
+    }
+
+    // Only override categories if the user is still on defaults
+    const usingDefaultCats =
+      JSON.stringify(state.expenseCategories) === JSON.stringify(DEFAULT_EXPENSE_CATS) &&
+      JSON.stringify(state.incomeCategories) === JSON.stringify(DEFAULT_INCOME_CATS);
+    if (usingDefaultCats && catsText) {
+      const cats = csvToCategories(catsText);
+      if (cats) {
+        if (cats.expense.length > 0) state.expenseCategories = cats.expense;
+        if (cats.income.length > 0) state.incomeCategories = cats.income;
+        updated = true;
+      }
+    }
+
+    if (isDefaultTheme(state.theme) && settingsText) {
+      const theme = csvToSettings(settingsText);
+      if (theme) {
+        state.theme = theme;
+        updated = true;
+      }
+    }
+
+    if (updated) saveState();
+    return updated;
+  }
 
 async function loadTransactionsFromBackend() {
+  if (!API_BASE) return false;
   try {
     console.log("Fetching transactions from backend...");
 
@@ -1531,6 +1626,7 @@ async function loadTransactionsFromBackend() {
   }
 }
 async function loadBudgetsFromBackend() {
+  if (!API_BASE) return false;
   try {
     const response = await fetch(`${API_BASE}/budgets`);
     const rows = await response.json();
@@ -1562,6 +1658,7 @@ async function loadBudgetsFromBackend() {
 }
 
 async function loadCategoriesFromBackend() {
+  if (!API_BASE) return false;
   try {
     const response = await fetch(`${API_BASE}/categories`);
     const rows = await response.json();
@@ -1590,6 +1687,7 @@ async function loadCategoriesFromBackend() {
 }
 
 async function loadSettingsFromBackend() {
+  if (!API_BASE) return false;
   try {
     const response = await fetch(`${API_BASE}/settings`);
     const rows = await response.json();
@@ -1620,6 +1718,7 @@ async function loadSettingsFromBackend() {
 }
 
 async function loadChallengeFromBackend() {
+  if (!API_BASE) return false;
   try {
     const response = await fetch(`${API_BASE}/challenge`);
     const rows = await response.json();
@@ -1650,7 +1749,17 @@ async function loadChallengeFromBackend() {
 async function init() {
   loadState();
 
-  await loadTransactionsFromBackend();
+  // Try to load data from the backend (if the server is running).
+  // If the backend is not available, fallback to the shipped sample_data CSVs.
+  await Promise.all([
+    loadTransactionsFromBackend(),
+    loadBudgetsFromBackend(),
+    loadCategoriesFromBackend(),
+    loadSettingsFromBackend(),
+    loadChallengeFromBackend()
+  ]);
+
+  await loadSampleData();
 
   applyTheme(state.theme);
   initNav();
