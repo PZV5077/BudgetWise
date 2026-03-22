@@ -1,5 +1,5 @@
 /* ============================================
-   BudgeWise — Main Application JavaScript
+   BudgetWise — Main Application JavaScript
    Pure JS, localStorage + auto CSV persistence
    ============================================ */
 
@@ -48,11 +48,21 @@
 
   // CSV file names stored in root directory
   const CSV_FILES = {
-    transactions: 'budgewise_transactions.csv',
-    budgets: 'budgewise_budgets.csv',
-    challenge: 'budgewise_challenge.csv',
-    categories: 'budgewise_categories.csv',
-    settings: 'budgewise_settings.csv'
+    transactions: 'budgetwise_transactions.csv',
+    budgets: 'budgetwise_budgets.csv',
+    challenge: 'budgetwise_challenge.csv',
+    categories: 'budgetwise_categories.csv',
+    settings: 'budgetwise_settings.csv'
+  };
+  const STORAGE_KEYS = {
+    data: 'budgetwise_data',
+    legacyData: ['bud', 'gewise_data'].join(''),
+    fsGranted: 'budgetwise_fs_granted',
+    legacyFsGranted: ['bud', 'gewise_fs_granted'].join('')
+  };
+  const EXPORT_FILES = {
+    transactions: 'budgetwise_transactions_export.csv',
+    backup: 'budgetwise_backup.json'
   };
 
   // ─── State ───
@@ -138,7 +148,8 @@
     try {
       dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
       fsAccessGranted = true;
-      localStorage.setItem('budgewise_fs_granted', '1');
+      localStorage.setItem(STORAGE_KEYS.fsGranted, '1');
+      localStorage.removeItem(STORAGE_KEYS.legacyFsGranted);
       updateFsStatusUI();
       // Immediately save all CSVs
       await saveAllCSVs();
@@ -431,7 +442,8 @@
       theme: state.theme
     };
     try {
-      localStorage.setItem('budgewise_data', JSON.stringify(data));
+      localStorage.setItem(STORAGE_KEYS.data, JSON.stringify(data));
+      localStorage.removeItem(STORAGE_KEYS.legacyData);
     } catch(e) {
       console.warn('Failed to save to localStorage:', e);
     }
@@ -441,7 +453,7 @@
 
   function loadState() {
     try {
-      const raw = localStorage.getItem('budgewise_data');
+      const raw = localStorage.getItem(STORAGE_KEYS.data) || localStorage.getItem(STORAGE_KEYS.legacyData);
       if (!raw) return;
       const data = JSON.parse(raw);
       if (data.transactions) state.transactions = data.transactions;
@@ -450,6 +462,10 @@
       if (data.budgets) state.budgets = data.budgets;
       if (data.challenge) state.challenge = data.challenge;
       if (data.theme) state.theme = data.theme;
+      if (!localStorage.getItem(STORAGE_KEYS.data)) {
+        localStorage.setItem(STORAGE_KEYS.data, raw);
+      }
+      localStorage.removeItem(STORAGE_KEYS.legacyData);
     } catch(e) {
       console.warn('Failed to load from localStorage:', e);
     }
@@ -1317,7 +1333,8 @@
     document.getElementById('jsonFileInput').addEventListener('change', importAllJSON);
     document.getElementById('clearAllBtn').addEventListener('click', () => {
       if (!confirm('This will delete ALL your data. Are you sure?')) return;
-      localStorage.removeItem('budgewise_data');
+      localStorage.removeItem(STORAGE_KEYS.data);
+      localStorage.removeItem(STORAGE_KEYS.legacyData);
       state.transactions = [];
       state.expenseCategories = [...DEFAULT_EXPENSE_CATS];
       state.incomeCategories = [...DEFAULT_INCOME_CATS];
@@ -1347,7 +1364,8 @@
     document.getElementById('fsDisconnectBtn').addEventListener('click', () => {
       dirHandle = null;
       fsAccessGranted = false;
-      localStorage.removeItem('budgewise_fs_granted');
+      localStorage.removeItem(STORAGE_KEYS.fsGranted);
+      localStorage.removeItem(STORAGE_KEYS.legacyFsGranted);
       updateFsStatusUI();
     });
   }
@@ -1381,7 +1399,7 @@
       csv += `${t.date},${t.type},${escapeCSV(t.category)},${escapeCSV(t.description)},${t.amount.toFixed(2)},${escapeCSV(t.notes || '')}\n`;
     });
 
-    downloadFile(csv, 'budgewise_transactions_export.csv', 'text/csv');
+    downloadFile(csv, EXPORT_FILES.transactions, 'text/csv');
   }
 
   function importTransCSV(e) {
@@ -1452,7 +1470,7 @@
       theme: state.theme,
       exportDate: new Date().toISOString()
     };
-    downloadFile(JSON.stringify(data, null, 2), 'budgewise_backup.json', 'application/json');
+    downloadFile(JSON.stringify(data, null, 2), EXPORT_FILES.backup, 'application/json');
   }
 
   function importAllJSON(e) {
