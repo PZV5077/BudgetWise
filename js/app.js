@@ -2,6 +2,7 @@
    BudgetWise — Main Application JavaScript
    Pure JS, localStorage + auto CSV persistence
    ============================================ */
+  
 
 (function() {
   'use strict';
@@ -1573,29 +1574,288 @@ function renderChallengeCalendar(ch) {
     document.getElementById('savingTip').textContent = tip;
   }
 
-  // ─── Initialise ───
-  function init() {
-    loadState();
-    applyTheme(state.theme);
-    initNav();
-    initMonthNavigation();
-    initThemePanel();
-    initTransactionModal();
-    initBudgets();
-    initChallenge();
-    initSettings();
-    initCSV();
-    updateAllMonthDisplays();
-    showRandomTip();
-    refreshDashboard();
+  // When deployed as a static site there may be no backend server available.
+  // Use the backend if it exists on the same origin, otherwise try loading from the
+  // shipped sample_data CSV files.
+  const API_BASE = (window.location.protocol === 'file:')
+    ? null
+    : `${window.location.origin}/api`;
+  const SAMPLE_DATA_BASE = 'sample_data';
 
-    setInterval(showRandomTip, 30000);
+  async function fetchText(url) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      return await res.text();
+    } catch (err) {
+      return null;
+    }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+  function isDefaultTheme(theme) {
+    return (
+      theme.primary === THEME_PRESETS.default.primary &&
+      theme.accent === THEME_PRESETS.default.accent &&
+      theme.bg === THEME_PRESETS.default.bg &&
+      theme.card === THEME_PRESETS.default.card &&
+      theme.text === THEME_PRESETS.default.text
+    );
   }
+
+  async function loadSampleData() {
+    const paths = {
+      transactions: `${SAMPLE_DATA_BASE}/${CSV_FILES.transactions}`,
+      budgets: `${SAMPLE_DATA_BASE}/${CSV_FILES.budgets}`,
+      challenge: `${SAMPLE_DATA_BASE}/${CSV_FILES.challenge}`,
+      categories: `${SAMPLE_DATA_BASE}/${CSV_FILES.categories}`,
+      settings: `${SAMPLE_DATA_BASE}/${CSV_FILES.settings}`
+    };
+
+    const [transText, budgetsText, challengeText, catsText, settingsText] = await Promise.all([
+      fetchText(paths.transactions),
+      fetchText(paths.budgets),
+      fetchText(paths.challenge),
+      fetchText(paths.categories),
+      fetchText(paths.settings)
+    ]);
+
+    let updated = false;
+
+    if (!state.transactions.length && transText) {
+      const trans = csvToTransactions(transText);
+      if (trans) {
+        state.transactions = trans;
+        updated = true;
+      }
+    }
+
+    if (!Object.keys(state.budgets).length && budgetsText) {
+      const budgets = csvToBudgets(budgetsText);
+      if (budgets) {
+        state.budgets = budgets;
+        updated = true;
+      }
+    }
+
+    if (!state.challenge && challengeText) {
+      const challenge = csvToChallenge(challengeText);
+      if (challenge) {
+        state.challenge = challenge;
+        updated = true;
+      }
+    }
+
+    // Only override categories if the user is still on defaults
+    const usingDefaultCats =
+      JSON.stringify(state.expenseCategories) === JSON.stringify(DEFAULT_EXPENSE_CATS) &&
+      JSON.stringify(state.incomeCategories) === JSON.stringify(DEFAULT_INCOME_CATS);
+    if (usingDefaultCats && catsText) {
+      const cats = csvToCategories(catsText);
+      if (cats) {
+        if (cats.expense.length > 0) state.expenseCategories = cats.expense;
+        if (cats.income.length > 0) state.incomeCategories = cats.income;
+        updated = true;
+      }
+    }
+
+    if (isDefaultTheme(state.theme) && settingsText) {
+      const theme = csvToSettings(settingsText);
+      if (theme) {
+        state.theme = theme;
+        updated = true;
+      }
+    }
+
+    if (updated) saveState();
+    return updated;
+  }
+
+async function loadTransactionsFromBackend() {
+  if (!API_BASE) return false;
+  try {
+    console.log("Fetching transactions from backend...");
+
+    const response = await fetch(`${API_BASE}/transactions`);
+    console.log("Response status:", response.status);
+
+    const rows = await response.json();
+    console.log("Raw backend rows:", rows);
+
+    state.transactions = rows.map(row => ({
+      id: row.ID || row.id || genId(),
+      date: row.Date || row.date || todayStr(),
+      type: (row.Type || row.type || 'expense').toLowerCase(),
+      category: row.Category || row.category || 'Other',
+      description: row.Description || row.description || 'Imported',
+      amount: Math.abs(parseFloat(row.Amount || row.amount || 0)),
+      notes: row.Notes || row.notes || ''
+    })).filter(t => !isNaN(t.amount) && t.amount > 0);
+
+    console.log("Mapped transactions:", state.transactions);
+
+    saveState();
+    return true;
+  } catch (err) {
+    console.error("Failed to load transactions from backend:", err);
+    return false;
+  }
+}
+async function loadBudgetsFromBackend() {
+  if (!API_BASE) return false;
+  try {
+    const response = await fetch(`${API_BASE}/budgets`);
+    const rows = await response.json();
+
+    const budgets = {};
+    rows.forEach(row => {
+      const mk = row.Month || row.month;
+      const type = row.Type || row.type;
+      const cat = row.Category || row.category || '';
+      const val = parseFloat(row.Value || row.value || 0);
+
+      if (!mk || isNaN(val)) return;
+      if (!budgets[mk]) budgets[mk] = { overall: 0, categories: {} };
+
+      if (type === 'overall') {
+        budgets[mk].overall = val;
+      } else if (type === 'category' && cat) {
+        budgets[mk].categories[cat] = val;
+      }
+    });
+
+    state.budgets = budgets;
+    saveState();
+    return true;
+  } catch (err) {
+    console.error("Failed to load budgets from backend:", err);
+    return false;
+  }
+}
+
+async function loadCategoriesFromBackend() {
+  if (!API_BASE) return false;
+  try {
+    const response = await fetch(`${API_BASE}/categories`);
+    const rows = await response.json();
+
+    const expense = [];
+    const income = [];
+
+    rows.forEach(row => {
+      const type = (row.Type || row.type || '').toLowerCase();
+      const name = row.Name || row.name;
+      if (!name) return;
+
+      if (type === 'expense') expense.push(name);
+      if (type === 'income') income.push(name);
+    });
+
+    if (expense.length) state.expenseCategories = expense;
+    if (income.length) state.incomeCategories = income;
+
+    saveState();
+    return true;
+  } catch (err) {
+    console.error("Failed to load categories from backend:", err);
+    return false;
+  }
+}
+
+async function loadSettingsFromBackend() {
+  if (!API_BASE) return false;
+  try {
+    const response = await fetch(`${API_BASE}/settings`);
+    const rows = await response.json();
+
+    const settings = {};
+    rows.forEach(row => {
+      const key = row.Key || row.key;
+      const value = row.Value || row.value;
+      if (key) settings[key] = value;
+    });
+
+    if (settings.theme_primary) {
+      state.theme = {
+        primary: settings.theme_primary,
+        accent: settings.theme_accent || '#059669',
+        bg: settings.theme_bg || '#f8f9fa',
+        card: settings.theme_card || '#ffffff',
+        text: settings.theme_text || '#1a1a2e'
+      };
+    }
+
+    saveState();
+    return true;
+  } catch (err) {
+    console.error("Failed to load settings from backend:", err);
+    return false;
+  }
+}
+
+async function loadChallengeFromBackend() {
+  if (!API_BASE) return false;
+  try {
+    const response = await fetch(`${API_BASE}/challenge`);
+    const rows = await response.json();
+
+    if (rows.length > 0) {
+      const row = rows[0];
+      state.challenge = {
+        startDate: row.StartDate || row.startDate || null,
+        savedDays: (row.SavedDays || row.savedDays || '')
+          .toString()
+          .split(';')
+          .filter(Boolean)
+          .map(Number),
+        withdrawn: String(row.Withdrawn || row.withdrawn || '').toLowerCase() === 'true'
+      };
+    }
+
+    saveState();
+    return true;
+  } catch (err) {
+    console.error("Failed to load challenge from backend:", err);
+    return false;
+  }
+}
+
+
+
+async function init() {
+  loadState();
+
+  // Try to load data from the backend (if the server is running).
+  // If the backend is not available, fallback to the shipped sample_data CSVs.
+  await Promise.all([
+    loadTransactionsFromBackend(),
+    loadBudgetsFromBackend(),
+    loadCategoriesFromBackend(),
+    loadSettingsFromBackend(),
+    loadChallengeFromBackend()
+  ]);
+
+  await loadSampleData();
+
+  applyTheme(state.theme);
+  initNav();
+  initMonthNavigation();
+  initThemePanel();
+  initTransactionModal();
+  initBudgets();
+  initChallenge();
+  initSettings();
+  initCSV();
+  updateAllMonthDisplays();
+  showRandomTip();
+  refreshDashboard();
+
+  setInterval(showRandomTip, 30000);
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
 
 })();
