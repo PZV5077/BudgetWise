@@ -1,9 +1,3 @@
-/* ============================================
-   BudgetWise — CSS Style System
-   Pure CSS, no frameworks, modern & minimal
-   ============================================ */
-
-/* --- CSS Custom Properties (Theme) --- */
 :root {
   --primary: #2563eb;
   --primary-light: #3b82f6;
@@ -31,7 +25,6 @@
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* --- Reset & Base --- */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -65,7 +58,6 @@ h4 { font-size: 0.95rem; color: var(--text-secondary); }
 
 a { color: var(--primary); text-decoration: none; }
 
-/* --- Top Bar --- */
 .top-bar {
   background: var(--card);
   border-bottom: 1px solid var(--card-border);
@@ -159,7 +151,6 @@ a { color: var(--primary); text-decoration: none; }
   color: var(--primary);
 }
 
-/* --- Theme Panel --- */
 .theme-panel {
   position: fixed;
   top: 0;
@@ -275,7 +266,6 @@ a { color: var(--primary); text-decoration: none; }
   background: var(--card);
 }
 
-/* --- Main Content --- */
 .main-content {
   max-width: 1200px;
   margin: 0 auto;
@@ -307,7 +297,6 @@ a { color: var(--primary); text-decoration: none; }
   flex-wrap: wrap;
 }
 
-/* --- Month Selector --- */
 .month-selector {
   display: flex;
   align-items: center;
@@ -340,7 +329,6 @@ a { color: var(--primary); text-decoration: none; }
   border-color: var(--primary);
 }
 
-/* --- Cards --- */
 .card {
   background: var(--card);
   border: 1px solid var(--card-border);
@@ -359,7 +347,6 @@ a { color: var(--primary); text-decoration: none; }
   gap: 8px;
 }
 
-/* --- Summary Grid --- */
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -402,7 +389,6 @@ a { color: var(--primary); text-decoration: none; }
 .summary-compare.up { color: var(--accent); }
 .summary-compare.down { color: var(--danger); }
 
-/* --- Budget Bar --- */
 .budget-bar-wrap {
   background: var(--bg-alt);
   height: 6px;
@@ -432,7 +418,6 @@ a { color: var(--primary); text-decoration: none; }
   background: var(--warning);
 }
 
-/* --- Charts --- */
 .chart-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -450,7 +435,6 @@ a { color: var(--primary); text-decoration: none; }
   position: relative;
 }
 
-/* --- Tables --- */
 .table-wrap {
   overflow-x: auto;
 }
@@ -506,7 +490,6 @@ a { color: var(--primary); text-decoration: none; }
   border-radius: var(--radius);
 }
 
-/* --- Buttons --- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -580,7 +563,6 @@ a { color: var(--primary); text-decoration: none; }
 .btn-icon:hover { color: var(--text); }
 .btn-icon.delete:hover { color: var(--danger); }
 
-/* --- Filter Bar --- */
 .filter-bar {
   display: flex;
   gap: 16px;
@@ -603,7 +585,6 @@ a { color: var(--primary); text-decoration: none; }
   letter-spacing: 0.04em;
 }
 
-/* --- Form Elements --- */
 select, input[type="text"], input[type="number"], input[type="date"], input[type="search"] {
   font-family: var(--font);
   font-size: 0.87rem;
@@ -624,7 +605,6 @@ select {
   cursor: pointer;
 }
 
-/* --- Modal --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -701,7 +681,6 @@ select {
   margin-top: 4px;
 }
 
-/* --- Inline Edit --- */
 .inline-edit {
   display: flex;
   align-items: center;
@@ -713,7 +692,6 @@ select {
   width: 120px;
 }
 
-/* --- Budget Overview --- */
 .budget-overview {
   display: flex;
   gap: 24px;
@@ -738,7 +716,6 @@ select {
   font-weight: 700;
 }
 
-/* --- Category Budget Items --- */
 .cat-budget-item {
   display: flex;
   align-items: center;
@@ -786,7 +763,6 @@ select {
   gap: 4px;
 }
 
-/* --- Comparison Grid --- */
 .comparison-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -840,7 +816,6 @@ select {
 .comparison-change.up { color: var(--danger); }
 .comparison-change.down { color: var(--accent); }
 
-/* --- 365 Challenge --- */
 .challenge-hero {
   text-align: center;
 }
@@ -894,7 +869,6 @@ select {
   gap: 10px;
   flex-wrap: wrap;
 }
-/* --- 365 Challenge (Real Calendar) --- */
 .challenge-calendar {
   margin: 16px 0;
 }
@@ -998,7 +972,6 @@ select {
   flex-wrap: wrap;
 }
 
-/* --- Settings --- */
 .settings-section {
   margin-bottom: 20px;
 }
@@ -1056,7 +1029,6 @@ select {
   flex-wrap: wrap;
 }
 
-/* --- Footer --- */
 .site-footer {
   background: var(--card);
   border-top: 1px solid var(--card-border);
@@ -1095,7 +1067,6 @@ select {
   color: var(--text-muted);
 }
 
-/* --- SVG Chart Styles --- */
 .svg-chart {
   width: 100%;
   height: 100%;
@@ -1129,7 +1100,6 @@ select {
   font-size: 0.9rem;
 }
 
-/* --- Tooltip --- */
 .tooltip {
   position: absolute;
   background: var(--text);
@@ -1142,7 +1112,6 @@ select {
   white-space: nowrap;
 }
 
-/* --- Responsive --- */
 @media (max-width: 900px) {
   .summary-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1199,7 +1168,6 @@ select {
   }
 }
 
-/* ─── Save Indicator ─── */
 .save-indicator {
   position: fixed;
   bottom: 60px;
@@ -1227,7 +1195,6 @@ select {
   color: #fff;
 }
 
-/* ─── File System Status ─── */
 .fs-status-row {
   margin: 12px 0;
 }
