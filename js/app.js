@@ -1,13 +1,6 @@
-/* ============================================
-   BudgetWise — Main Application JavaScript
-   Pure JS, localStorage + auto CSV persistence
-   ============================================ */
-  
-
 (function() {
   'use strict';
 
-  // ─── Default Data ───
   const DEFAULT_EXPENSE_CATS = [
     'Housing', 'Groceries', 'Transport', 'Utilities', 'Entertainment',
     'Dining Out', 'Health', 'Shopping', 'Education', 'Subscriptions', 'Other'
@@ -47,7 +40,6 @@
     rose:    { primary: '#be185d', accent: '#9333ea', bg: '#fdf2f8', card: '#ffffff', text: '#4a044e' }
   };
 
-  // CSV file names stored in root directory
   const CSV_FILES = {
     transactions: 'budgetwise_transactions.csv',
     budgets: 'budgetwise_budgets.csv',
@@ -66,7 +58,6 @@
     backup: 'budgetwise_backup.json'
   };
 
-  // ─── State ───
   let state = {
     transactions: [],
     expenseCategories: [...DEFAULT_EXPENSE_CATS],
@@ -77,11 +68,9 @@
     currentMonth: new Date()
   };
 
-  // ─── File System Access API handles ───
-  let dirHandle = null;       // root directory handle
-  let fsAccessGranted = false; // whether we have write access
+  let dirHandle = null;
+  let fsAccessGranted = false;
 
-  // ─── Utility Functions ───
   function genId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
   }
@@ -140,7 +129,6 @@
     return s;
   }
 
-  // ─── File System Access API — CSV Auto-Save ───
 
   async function requestDirectoryAccess() {
     if (!window.showDirectoryPicker) {
@@ -152,7 +140,6 @@
       localStorage.setItem(STORAGE_KEYS.fsGranted, '1');
       localStorage.removeItem(STORAGE_KEYS.legacyFsGranted);
       updateFsStatusUI();
-      // Immediately save all CSVs
       await saveAllCSVs();
       return true;
     } catch (e) {
@@ -172,7 +159,6 @@
       return true;
     } catch (e) {
       console.warn('Failed to write ' + filename + ':', e);
-      // If permission was revoked, mark as not granted
       if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
         fsAccessGranted = false;
         updateFsStatusUI();
@@ -188,12 +174,10 @@
       const file = await fileHandle.getFile();
       return await file.text();
     } catch (e) {
-      // File doesn't exist yet — that's fine
       return null;
     }
   }
 
-  // ─── CSV Serialisation / Deserialisation ───
 
   function transactionsToCSV() {
     let csv = 'ID,Date,Type,Category,Description,Amount,Notes\n';
@@ -381,7 +365,6 @@
     return null;
   }
 
-  // ─── Persistence Layer ───
 
   async function saveAllCSVs() {
     if (!dirHandle || !fsAccessGranted) return;
@@ -433,7 +416,6 @@
   }
 
   function saveState() {
-    // Always save to localStorage as fast cache
     const data = {
       transactions: state.transactions,
       expenseCategories: state.expenseCategories,
@@ -448,7 +430,6 @@
     } catch(e) {
       console.warn('Failed to save to localStorage:', e);
     }
-    // Auto-save to CSV files in background
     saveAllCSVs();
   }
 
@@ -472,7 +453,6 @@
     }
   }
 
-  // ─── Save Indicator ───
   function flashSaveIndicator(success) {
     const el = document.getElementById('saveIndicator');
     if (!el) return;
@@ -507,7 +487,6 @@
     }
   }
 
-  // ─── Theme System ───
   function applyTheme(theme) {
     const root = document.documentElement;
     root.style.setProperty('--primary', theme.primary);
@@ -585,7 +564,6 @@
     });
   }
 
-  // ─── Navigation ───
   window.switchTab = function(tabName) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -617,7 +595,6 @@
     return active ? active.dataset.tab : 'dashboard';
   }
 
-  // ─── Month Navigation Helpers ───
   function updateAllMonthDisplays() {
     const label = monthLabel(state.currentMonth);
     document.getElementById('dashCurrentMonth').textContent = label;
@@ -646,7 +623,6 @@
     });
   }
 
-  // ─── Data Queries ───
   function getTransactionsForMonth(date) {
     const key = monthKey(date);
     return state.transactions.filter(t => monthKey(t.date) === key);
@@ -676,7 +652,6 @@
     return state.budgets[key] || { overall: 0, categories: {} };
   }
 
-  // ─── Dashboard ───
   function refreshDashboard() {
     const current = getMonthTotals(state.currentMonth);
     const prev = getMonthTotals(prevMonth(state.currentMonth));
@@ -721,7 +696,6 @@
     el.className = 'summary-compare ' + ((isUp === higherIsGood) ? 'up' : 'down');
   }
 
-  // ─── SVG Charts ───
   const CHART_COLORS = ['#2563eb','#059669','#d97706','#dc2626','#7c3aed','#0891b2','#be185d','#65a30d','#ea580c','#6366f1','#0d9488','#c026d3'];
 
   function renderCategoryChart() {
@@ -839,7 +813,6 @@
     `).join('');
   }
 
-  // ─── Transactions Tab ───
   function refreshTransactions() {
     let trans = getTransactionsForMonth(state.currentMonth);
 
@@ -889,7 +862,6 @@
     sel.value = current;
   }
 
-  // Transaction Modal
   function initTransactionModal() {
     const modal = document.getElementById('transModal');
     const form = document.getElementById('transForm');
@@ -995,7 +967,6 @@
     refreshCurrentTab(getCurrentTab());
   };
 
-  // ─── Budgets Tab ───
   function refreshBudgets() {
     const key = monthKey(state.currentMonth);
     const budget = getBudgetForMonth(state.currentMonth);
@@ -1146,7 +1117,6 @@
     }
   };
 
-  // ─── 365 Challenge ───
   function refreshChallenge() {
     const ch = state.challenge;
     const startBtn = document.getElementById('challengeStartBtn');
@@ -1227,18 +1197,15 @@ function renderChallengeCalendar(ch) {
     today.setHours(0,0,0,0);
     const savedDays = ch.savedDays || [];
 
-    // 计算挑战的结束日期 (365天后)
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 364);
 
-    // 确定需要渲染的月份范围
     let currentMonthDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
     const endMonthDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
 
     let html = '<div class="months-wrapper">';
     const weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
-    // 循环生成每一个月的日历
     while (currentMonthDate <= endMonthDate) {
       const year = currentMonthDate.getFullYear();
       const month = currentMonthDate.getMonth();
@@ -1248,32 +1215,26 @@ function renderChallengeCalendar(ch) {
       html += `<h4 class="month-title">${monthName}</h4>`;
       html += `<div class="month-grid">`;
 
-      // 星期表头
       weekdays.forEach(wd => {
         html += `<div class="weekday-header">${wd}</div>`;
       });
 
-      // 计算这个月的第一天是星期几 (0是星期日，转换为 1-7，星期一为1)
       let firstDayIndex = new Date(year, month, 1).getDay();
       firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1; 
 
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-      // 填充前面的空白天数
       for (let i = 0; i < firstDayIndex; i++) {
         html += `<div class="challenge-day empty"></div>`;
       }
 
-      // 渲染这个月的每一天
       for (let d = 1; d <= daysInMonth; d++) {
         const iterDate = new Date(year, month, d);
         iterDate.setHours(0,0,0,0);
 
-        // 计算这一天是挑战的第几天
         const daysSinceStart = Math.floor((iterDate - startDate) / 86400000);
         const challengeDayNum = daysSinceStart + 1;
 
-        // 判断这一天是否在 365 天的挑战范围内
         if (challengeDayNum >= 1 && challengeDayNum <= 365) {
           let cls = 'challenge-day ';
           const isToday = (iterDate.getTime() === today.getTime());
@@ -1288,13 +1249,11 @@ function renderChallengeCalendar(ch) {
           const displayDate = iterDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
           html += `<div class="${cls}" title="${displayDate} - Day ${challengeDayNum}: ${challengeDayNum}p${isSaved ? ' ✓' : ''}">${d}</div>`;
         } else {
-          // 不在挑战范围内的日期（变成半透明）
           html += `<div class="challenge-day out-of-bounds">${d}</div>`;
         }
       }
 
       html += `</div></div>`;
-      // 进入下一个月
       currentMonthDate.setMonth(currentMonthDate.getMonth() + 1);
     }
 
@@ -1345,7 +1304,6 @@ function renderChallengeCalendar(ch) {
     });
   }
 
-  // ─── Settings ───
   function refreshSettings() {
     renderCategoryList('expenseCatList', state.expenseCategories, 'expense');
     renderCategoryList('incomeCatList', state.incomeCategories, 'income');
@@ -1385,7 +1343,6 @@ function renderChallengeCalendar(ch) {
       }
     });
 
-    // Data management
     document.getElementById('exportAllBtn').addEventListener('click', exportAllJSON);
     document.getElementById('importAllBtn').addEventListener('click', () => document.getElementById('jsonFileInput').click());
     document.getElementById('jsonFileInput').addEventListener('change', importAllJSON);
@@ -1404,15 +1361,13 @@ function renderChallengeCalendar(ch) {
       refreshCurrentTab(getCurrentTab());
     });
 
-    // File System Access — Connect/Disconnect
     document.getElementById('fsConnectBtn').addEventListener('click', async () => {
       const ok = await requestDirectoryAccess();
       if (ok) {
-        // Try loading from CSV if there's data there
         const loaded = await loadFromCSVs();
         if (loaded) {
           applyTheme(state.theme);
-          saveState(); // sync localStorage
+          saveState();
           refreshCurrentTab(getCurrentTab());
         }
         refreshSettings();
@@ -1438,7 +1393,6 @@ function renderChallengeCalendar(ch) {
     refreshSettings();
   };
 
-  // ─── Manual CSV Import/Export (Transactions page) ───
   function initCSV() {
     document.getElementById('exportCsvBtn').addEventListener('click', exportTransCSV);
     document.getElementById('importCsvBtn').addEventListener('click', () => document.getElementById('csvFileInput').click());
@@ -1517,7 +1471,6 @@ function renderChallengeCalendar(ch) {
     reader.readAsText(file);
   }
 
-  // ─── JSON Export/Import ───
   function exportAllJSON() {
     const data = {
       transactions: state.transactions,
@@ -1568,15 +1521,11 @@ function renderChallengeCalendar(ch) {
     URL.revokeObjectURL(url);
   }
 
-  // ─── Saving Tips ───
   function showRandomTip() {
     const tip = SAVING_TIPS[Math.floor(Math.random() * SAVING_TIPS.length)];
     document.getElementById('savingTip').textContent = tip;
   }
 
-  // When deployed as a static site there may be no backend server available.
-  // Use the backend if it exists on the same origin, otherwise try loading from the
-  // shipped sample_data CSV files.
   const API_BASE = (window.location.protocol === 'file:')
     ? null
     : `${window.location.origin}/api`;
@@ -1645,7 +1594,6 @@ function renderChallengeCalendar(ch) {
       }
     }
 
-    // Only override categories if the user is still on defaults
     const usingDefaultCats =
       JSON.stringify(state.expenseCategories) === JSON.stringify(DEFAULT_EXPENSE_CATS) &&
       JSON.stringify(state.incomeCategories) === JSON.stringify(DEFAULT_INCOME_CATS);
@@ -1824,8 +1772,6 @@ async function loadChallengeFromBackend() {
 async function init() {
   loadState();
 
-  // Try to load data from the backend (if the server is running).
-  // If the backend is not available, fallback to the shipped sample_data CSVs.
   await Promise.all([
     loadTransactionsFromBackend(),
     loadBudgetsFromBackend(),

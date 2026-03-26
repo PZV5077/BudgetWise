@@ -9,8 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Top Bar -->
-  <header class="top-bar">
+<header class="top-bar">
     <div class="top-bar-inner">
       <div class="logo">
         <span class="logo-icon">£</span>
@@ -28,9 +27,7 @@
       </button>
     </div>
   </header>
-
-  <!-- Theme Customiser Panel -->
-  <div class="theme-panel" id="themePanel">
+<div class="theme-panel" id="themePanel">
     <div class="theme-panel-header">
       <h3>Customise Colours</h3>
       <button class="theme-panel-close" id="themePanelClose">&times;</button>
@@ -67,12 +64,8 @@
     </div>
   </div>
   <div class="theme-overlay" id="themeOverlay"></div>
-
-  <!-- Main Content -->
-  <main class="main-content">
-
-    <!-- ===== DASHBOARD TAB ===== -->
-    <section class="tab-content active" id="tab-dashboard">
+<main class="main-content">
+<section class="tab-content active" id="tab-dashboard">
       <div class="section-header">
         <h1>Dashboard</h1>
         <div class="month-selector">
@@ -81,9 +74,7 @@
           <button class="month-arrow" id="dashNextMonth">&rarr;</button>
         </div>
       </div>
-
-      <!-- Summary Cards -->
-      <div class="summary-grid">
+<div class="summary-grid">
         <div class="summary-card income-card">
           <div class="summary-label">Income</div>
           <div class="summary-value" id="dashIncome">£0.00</div>
@@ -107,9 +98,7 @@
           </div>
         </div>
       </div>
-
-      <!-- Charts Area -->
-      <div class="chart-row">
+<div class="chart-row">
         <div class="card chart-card">
           <h3>Spending by Category</h3>
           <div class="chart-container" id="categoryChart"></div>
@@ -119,9 +108,7 @@
           <div class="chart-container" id="comparisonChart"></div>
         </div>
       </div>
-
-      <!-- Recent Transactions -->
-      <div class="card">
+<div class="card">
         <div class="card-header">
           <h3>Recent Transactions</h3>
           <button class="btn btn-sm" onclick="switchTab('transactions')">View All</button>
@@ -141,9 +128,7 @@
         </div>
       </div>
     </section>
-
-    <!-- ===== TRANSACTIONS TAB ===== -->
-    <section class="tab-content" id="tab-transactions">
+<section class="tab-content" id="tab-transactions">
       <div class="section-header">
         <h1>Transactions</h1>
         <div class="header-actions">
@@ -153,9 +138,7 @@
           <input type="file" id="csvFileInput" accept=".csv" style="display:none">
         </div>
       </div>
-
-      <!-- Filters -->
-      <div class="filter-bar card">
+<div class="filter-bar card">
         <div class="filter-group">
           <label>Month</label>
           <div class="month-selector">
@@ -183,9 +166,7 @@
           <input type="text" id="filterSearch" placeholder="Search description...">
         </div>
       </div>
-
-      <!-- Transactions Table -->
-      <div class="card">
+<div class="card">
         <div class="table-wrap">
           <table class="data-table" id="transTable">
             <thead>
@@ -203,9 +184,7 @@
         <div class="table-empty" id="transEmpty">No transactions found for this period.</div>
       </div>
     </section>
-
-    <!-- ===== BUDGETS TAB ===== -->
-    <section class="tab-content" id="tab-budgets">
+<section class="tab-content" id="tab-budgets">
       <div class="section-header">
         <h1>Budgets</h1>
         <div class="month-selector">
@@ -214,9 +193,7 @@
           <button class="month-arrow" id="budgetNextMonth">&rarr;</button>
         </div>
       </div>
-
-      <!-- Overall Budget -->
-      <div class="card">
+<div class="card">
         <div class="card-header">
           <h3>Monthly Spending Target</h3>
           <div class="inline-edit">
@@ -243,25 +220,19 @@
           <div class="budget-bar" id="overallBudgetBar" style="width:0%"></div>
         </div>
       </div>
-
-      <!-- Category Budgets -->
-      <div class="card">
+<div class="card">
         <div class="card-header">
           <h3>Category Targets</h3>
           <button class="btn btn-sm btn-primary" id="addCategoryBudgetBtn">+ Add Category Target</button>
         </div>
         <div id="categoryBudgetsList"></div>
       </div>
-
-      <!-- Comparison -->
-      <div class="card">
+<div class="card">
         <h3>Month-over-Month Comparison</h3>
         <div class="comparison-grid" id="monthComparisonGrid"></div>
       </div>
     </section>
-
-    <!-- ===== 365 CHALLENGE TAB ===== -->
-    <section class="tab-content" id="tab-challenge">
+<section class="tab-content" id="tab-challenge">
       <div class="section-header">
         <h1>365 Penny Challenge</h1>
       </div>
@@ -296,9 +267,7 @@
           <button class="btn btn-accent" id="challengeWithdrawBtn" style="display:none">Withdraw £667.95</button>
         </div>
       </div>
-
-      <!-- Calendar Grid -->
-      <div class="card">
+<div class="card">
         <h3>Progress Calendar</h3>
         <div class="challenge-calendar" id="challengeCalendar"></div>
         <div class="challenge-legend">
@@ -309,9 +278,7 @@
         </div>
       </div>
     </section>
-
-    <!-- ===== SETTINGS TAB ===== -->
-    <section class="tab-content" id="tab-settings">
+<section class="tab-content" id="tab-settings">
       <div class="section-header">
         <h1>Settings</h1>
       </div>
@@ -335,9 +302,7 @@
           </div>
         </div>
       </div>
-
-      <!-- CSV Auto-Save -->
-      <div class="card">
+<div class="card">
         <h3>CSV Auto-Save</h3>
         <p class="settings-desc">Connect a local folder to automatically save all your data as CSV files whenever changes are made. Your data stays on your computer — nothing is uploaded anywhere.</p>
         <div class="fs-status-row">
@@ -370,9 +335,7 @@
       </div>
     </section>
   </main>
-
-  <!-- Add/Edit Transaction Modal -->
-  <div class="modal-overlay" id="transModal">
+<div class="modal-overlay" id="transModal">
     <div class="modal">
       <div class="modal-header">
         <h3 id="transModalTitle">Add Transaction</h3>
@@ -418,9 +381,7 @@
       </form>
     </div>
   </div>
-
-  <!-- Add Category Budget Modal -->
-  <div class="modal-overlay" id="catBudgetModal">
+<div class="modal-overlay" id="catBudgetModal">
     <div class="modal">
       <div class="modal-header">
         <h3>Set Category Target</h3>
@@ -442,12 +403,8 @@
       </form>
     </div>
   </div>
-
-  <!-- Save Indicator -->
-  <div id="saveIndicator" class="save-indicator"></div>
-
-  <!-- Footer -->
-  <footer class="site-footer">
+<div id="saveIndicator" class="save-indicator"></div>
+<footer class="site-footer">
     <div class="footer-inner">
       <div class="saving-tip">
         <span class="tip-icon">💡</span>
