@@ -28,27 +28,27 @@ def login():
 
 @app.route("/api/transactions")
 def get_transactions():
-    return jsonify(read_csv_file("budgewise_transactions.csv"))
+    return jsonify(read_csv_file("budgetwise_transactions.csv"))
 
 
 @app.route("/api/budgets")
 def get_budgets():
-    return jsonify(read_csv_file("budgewise_budgets.csv"))
+    return jsonify(read_csv_file("budgetwise_budgets.csv"))
 
 
 @app.route("/api/categories")
 def get_categories():
-    return jsonify(read_csv_file("budgewise_categories.csv"))
+    return jsonify(read_csv_file("budgetwise_categories.csv"))
 
 
 @app.route("/api/challenge")
 def get_challenge():
-    return jsonify(read_csv_file("budgewise_challenge.csv"))
+    return jsonify(read_csv_file("budgetwise_challenge.csv"))
 
 
 @app.route("/api/settings")
 def get_settings():
-    return jsonify(read_csv_file("budgewise_settings.csv"))
+    return jsonify(read_csv_file("budgetwise_settings.csv"))
 
 
 if __name__ == "__main__":
