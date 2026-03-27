@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BudgetWise — Sign Up</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-shell {
+      min-height: calc(100vh - 56px);
+      display: grid;
+      place-items: center;
+      padding: 32px 16px;
+    }
+
+    .auth-wrap {
+      width: 100%;
+      max-width: 980px;
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .auth-card {
+      margin-bottom: 0;
+      height: 100%;
+    }
+
+    .auth-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+      min-height: 100%;
+    }
+
+    .auth-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 6px 10px;
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      background: var(--bg-alt);
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .auth-side h1 {
+      font-size: 2.1rem;
+      line-height: 1.15;
+      max-width: 11ch;
+    }
+
+    .auth-side p {
+      color: var(--text-secondary);
+      max-width: 58ch;
+    }
+
+    .auth-list {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .auth-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-alt);
+      color: var(--text-secondary);
+      font-size: 0.87rem;
+    }
+
+    .auth-list strong {
+      color: var(--text);
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.9rem;
+    }
+
+    .auth-list-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(5, 150, 105, 0.12);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .auth-form-header {
+      margin-bottom: 18px;
+    }
+
+    .auth-form-header p {
+      color: var(--text-secondary);
+      margin-top: 6px;
+      font-size: 0.92rem;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .auth-form .form-group {
+      margin-bottom: 0;
+    }
+
+    .auth-form input[type="text"],
+    .auth-form input[type="email"],
+    .auth-form input[type="password"] {
+      width: 100%;
+    }
+
+    .auth-form .form-row {
+      gap: 14px;
+    }
+
+    .auth-submit {
+      justify-content: center;
+      width: 100%;
+      min-height: 42px;
+      margin-top: 4px;
+    }
+
+    .auth-agreement {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-size: 0.84rem;
+      line-height: 1.5;
+    }
+
+    .auth-agreement input {
+      margin-top: 3px;
+      accent-color: var(--primary);
+    }
+
+    .auth-meta {
+      margin-top: 16px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.87rem;
+    }
+
+    .auth-status {
+      display: none;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      font-size: 0.86rem;
+      border: 1px solid transparent;
+      margin-bottom: 2px;
+    }
+
+    .auth-status.show {
+      display: block;
+    }
+
+    .auth-status.error {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #991b1b;
+    }
+
+    .auth-status.success {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #065f46;
+    }
+
+    @media (max-width: 860px) {
+      .auth-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-side h1 {
+        max-width: none;
+        font-size: 1.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="top-bar">
+    <div class="top-bar-inner">
+        <span class="logo-text">BudgetWise</span>
+      <nav class="main-nav"></nav>
+      <a class="btn btn-sm" href="/login">Back to login</a>
+    </div>
+  </header>
+
+  <main class="auth-shell">
+    <section class="auth-wrap">
+      <article class="card auth-card auth-side">
+          <p>Create your BudgetWise account to track spending, set category budgets, and keep your financial goals organised from day one.</p>
+
+        <ul class="auth-list">
+          <li>
+            <span class="auth-list-icon">1</span>
+            <div>
+              <strong>Track income and expenses</strong>
+              Build a clean view of what comes in and what goes out.
+            </div>
+          </li>
+          <li>
+            <span class="auth-list-icon">2</span>
+            <div>
+              <strong>Set budget targets</strong>
+              Keep monthly limits visible so overspending is harder to ignore.
+            </div>
+          </li>
+          <li>
+            <span class="auth-list-icon">3</span>
+            <div>
+              <strong>Stay consistent</strong>
+              Use one simple place to check your progress and keep momentum.
+            </div>
+          </li>
+        </ul>
+      </article>
+
+      <article class="card auth-card">
+        <div class="auth-form-header">
+          <h3>Sign up</h3>
+          <p>Create an account with your basic details.</p>
+        </div>
+
+        <div id="statusMessage" class="auth-status" role="alert" aria-live="polite"></div>
+
+        <form id="signupForm" class="auth-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First name</label>
+              <input id="firstName" name="firstName" type="text" placeholder="John" autocomplete="given-name" required>
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last name</label>
+              <input id="lastName" name="lastName" type="text" placeholder="Doe" autocomplete="family-name" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" placeholder="Create a password" autocomplete="new-password" minlength="8" required>
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Confirm password</label>
+              <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Repeat your password" autocomplete="new-password" minlength="8" required>
+            </div>
+          </div>
+
+          <button id="signupButton" type="submit" class="btn btn-primary auth-submit">Create account</button>
+        </form>
+
+        <p class="auth-meta">
+          Already have an account?
+          <a href="/login">Log in here</a>
+        </p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const form = document.getElementById('signupForm');
+      const button = document.getElementById('signupButton');
+      const status = document.getElementById('statusMessage');
+
+      function showStatus(message, type) {
+        status.textContent = message;
+        status.className = `auth-status show ${type}`;
+      }
+
+      function clearStatus() {
+        status.textContent = '';
+        status.className = 'auth-status';
+      }
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        clearStatus();
+
+        const formData = new FormData(form);
+        const firstName = String(formData.get('firstName') || '').trim();
+        const lastName = String(formData.get('lastName') || '').trim();
+        const email = String(formData.get('email') || '').trim();
+        const password = String(formData.get('password') || '');
+        const confirmPassword = String(formData.get('confirmPassword') || '');
+
+        if (!firstName || !lastName || !email || !password || !confirmPassword) {
+          showStatus('Fill in every field before creating your account.', 'error');
+          return;
+        }
+
+        if (password.length < 8) {
+          showStatus('Use a password with at least 8 characters.', 'error');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          showStatus('Your passwords do not match.', 'error');
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent = 'Creating account...';
+
+        try {
+          const response = await fetch('/api/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ firstName, lastName, email, password })
+          });
+
+          let payload = {};
+          try {
+            payload = await response.json();
+          } catch (err) {
+            payload = {};
+          }
+
+          if (!response.ok) {
+            if (response.status === 404) {
+              throw new Error('The signup page is ready, but your Flask backend still needs a POST /api/signup route.');
+            }
+            throw new Error(payload.message || 'Signup failed. Try again.');
+          }
+
+          showStatus(payload.message || 'Account created successfully. Redirecting to login...', 'success');
+          form.reset();
+          window.setTimeout(function () {
+            window.location.href = payload.redirect || '/login';
+          }, 900);
+        } catch (error) {
+          showStatus(error.message || 'Something went wrong while creating your account.', 'error');
+        } finally {
+          button.disabled = false;
+          button.textContent = 'Create account';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

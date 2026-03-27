@@ -1,5 +1,5 @@
 /* ============================================
-   BudgeWise — Main Application JavaScript
+   BudgetWise — Main Application JavaScript
    Pure JS, localStorage + auto CSV persistence
    ============================================ */
   
@@ -49,11 +49,11 @@
 
   // CSV file names stored in root directory
   const CSV_FILES = {
-    transactions: 'budgewise_transactions.csv',
-    budgets: 'budgewise_budgets.csv',
-    challenge: 'budgewise_challenge.csv',
-    categories: 'budgewise_categories.csv',
-    settings: 'budgewise_settings.csv'
+    transactions: 'budgetwise_transactions.csv',
+    budgets: 'budgetwise_budgets.csv',
+    challenge: 'budgetwise_challenge.csv',
+    categories: 'budgetwise_categories.csv',
+    settings: 'budgetwise_settings.csv'
   };
 
   // ─── State ───
@@ -70,6 +70,7 @@
   // ─── File System Access API handles ───
   let dirHandle = null;       // root directory handle
   let fsAccessGranted = false; // whether we have write access
+  let storageKey = 'budgetwise_data';
 
   // ─── Utility Functions ───
   function genId() {
@@ -139,7 +140,7 @@
     try {
       dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
       fsAccessGranted = true;
-      localStorage.setItem('budgewise_fs_granted', '1');
+      localStorage.setItem('budgetwise_fs_granted', '1');
       updateFsStatusUI();
       // Immediately save all CSVs
       await saveAllCSVs();
@@ -432,7 +433,7 @@
       theme: state.theme
     };
     try {
-      localStorage.setItem('budgewise_data', JSON.stringify(data));
+      localStorage.setItem(storageKey, JSON.stringify(data));
     } catch(e) {
       console.warn('Failed to save to localStorage:', e);
     }
@@ -442,7 +443,7 @@
 
   function loadState() {
     try {
-      const raw = localStorage.getItem('budgewise_data');
+      const raw = localStorage.getItem(storageKey);
       if (!raw) return;
       const data = JSON.parse(raw);
       if (data.transactions) state.transactions = data.transactions;
@@ -535,9 +536,37 @@
     const overlay = document.getElementById('themeOverlay');
     const toggleBtn = document.getElementById('themeToggleBtn');
     const closeBtn = document.getElementById('themePanelClose');
+    let themeSyncTimeout = null;
 
     function openPanel() { panel.classList.add('open'); overlay.classList.add('open'); }
     function closePanel() { panel.classList.remove('open'); overlay.classList.remove('open'); }
+
+    async function syncThemeToBackend() {
+      if (!API_BASE) return;
+      try {
+        await apiFetch('/settings', {
+          method: 'PUT',
+          body: JSON.stringify({
+            settings: {
+              theme_primary: state.theme.primary,
+              theme_accent: state.theme.accent,
+              theme_bg: state.theme.bg,
+              theme_card: state.theme.card,
+              theme_text: state.theme.text
+            }
+          })
+        });
+      } catch (err) {
+        console.error('Failed to sync theme to backend:', err);
+      }
+    }
+
+    function queueThemeSync() {
+      if (themeSyncTimeout) clearTimeout(themeSyncTimeout);
+      themeSyncTimeout = setTimeout(() => {
+        syncThemeToBackend();
+      }, 250);
+    }
 
     toggleBtn.addEventListener('click', openPanel);
     closeBtn.addEventListener('click', closePanel);
@@ -554,6 +583,7 @@
         };
         applyTheme(state.theme);
         saveState();
+        queueThemeSync();
       });
     });
 
@@ -564,6 +594,7 @@
           state.theme = { ...THEME_PRESETS[preset] };
           applyTheme(state.theme);
           saveState();
+          queueThemeSync();
         }
       });
     });
@@ -889,9 +920,9 @@
 
     typeSelect.addEventListener('change', () => updateTransCatOptions());
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      saveTransaction();
+      await saveTransaction();
     });
 
     ['filterType','filterCategory'].forEach(id => {
@@ -941,7 +972,7 @@
     sel.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
   }
 
-  function saveTransaction() {
+  async function saveTransaction() {
     const editId = document.getElementById('transEditId').value;
     const data = {
       type: document.getElementById('transType').value,
@@ -954,16 +985,46 @@
 
     if (!data.description || !data.date || isNaN(data.amount) || data.amount <= 0) return;
 
-    if (editId) {
-      const idx = state.transactions.findIndex(t => t.id === editId);
-      if (idx >= 0) {
-        state.transactions[idx] = { ...state.transactions[idx], ...data };
+    if (API_BASE) {
+      try {
+        if (editId) {
+          await apiFetch(`/transactions/${encodeURIComponent(editId)}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+          });
+        } else {
+          await apiFetch('/transactions', {
+            method: 'POST',
+            body: JSON.stringify(data)
+          });
+        }
+
+        await syncBackendState();
+      } catch (err) {
+        console.error('Failed to save transaction to backend:', err);
+        // fallback to local state for offline mode
+        if (editId) {
+          const idx = state.transactions.findIndex(t => t.id === editId);
+          if (idx >= 0) {
+            state.transactions[idx] = { ...state.transactions[idx], ...data };
+          }
+        } else {
+          state.transactions.push({ id: genId(), ...data });
+        }
+        saveState();
       }
     } else {
-      state.transactions.push({ id: genId(), ...data });
+      if (editId) {
+        const idx = state.transactions.findIndex(t => t.id === editId);
+        if (idx >= 0) {
+          state.transactions[idx] = { ...state.transactions[idx], ...data };
+        }
+      } else {
+        state.transactions.push({ id: genId(), ...data });
+      }
+      saveState();
     }
 
-    saveState();
     closeTransModal();
     refreshCurrentTab(getCurrentTab());
   }
@@ -972,10 +1033,24 @@
     openTransModal(id);
   };
 
-  window.deleteTransaction = function(id) {
+  window.deleteTransaction = async function(id) {
     if (!confirm('Delete this transaction?')) return;
-    state.transactions = state.transactions.filter(t => t.id !== id);
-    saveState();
+
+    if (API_BASE) {
+      try {
+        await apiFetch(`/transactions/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        await syncBackendState();
+      } catch (err) {
+        console.error('Failed to delete transaction from backend:', err);
+        // fallback to local state
+        state.transactions = state.transactions.filter(t => t.id !== id);
+        saveState();
+      }
+    } else {
+      state.transactions = state.transactions.filter(t => t.id !== id);
+      saveState();
+    }
+
     refreshCurrentTab(getCurrentTab());
   };
 
@@ -1086,11 +1161,29 @@
   }
 
   function initBudgets() {
-    document.getElementById('saveOverallBudget').addEventListener('click', () => {
+    document.getElementById('saveOverallBudget').addEventListener('click', async () => {
       const key = monthKey(state.currentMonth);
-      if (!state.budgets[key]) state.budgets[key] = { overall: 0, categories: {} };
-      state.budgets[key].overall = parseFloat(document.getElementById('overallBudgetInput').value) || 0;
-      saveState();
+      const value = parseFloat(document.getElementById('overallBudgetInput').value) || 0;
+
+      if (API_BASE) {
+        try {
+          await apiFetch('/budgets', {
+            method: 'PUT',
+            body: JSON.stringify({ month: key, type: 'overall', value })
+          });
+          await loadBudgetsFromBackend();
+        } catch (err) {
+          console.error('Failed to save overall budget to backend:', err);
+          if (!state.budgets[key]) state.budgets[key] = { overall: 0, categories: {} };
+          state.budgets[key].overall = value;
+          saveState();
+        }
+      } else {
+        if (!state.budgets[key]) state.budgets[key] = { overall: 0, categories: {} };
+        state.budgets[key].overall = value;
+        saveState();
+      }
+
       refreshBudgets();
       refreshDashboard();
     });
@@ -1106,28 +1199,63 @@
     document.getElementById('catBudgetCancel').addEventListener('click', () => modal.classList.remove('open'));
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
 
-    document.getElementById('catBudgetForm').addEventListener('submit', (e) => {
+    document.getElementById('catBudgetForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const cat = document.getElementById('catBudgetSelect').value;
       const amount = parseFloat(document.getElementById('catBudgetAmount').value);
       if (!cat || isNaN(amount) || amount < 0) return;
 
       const key = monthKey(state.currentMonth);
-      if (!state.budgets[key]) state.budgets[key] = { overall: 0, categories: {} };
-      state.budgets[key].categories[cat] = amount;
-      saveState();
+
+      if (API_BASE) {
+        try {
+          await apiFetch('/budgets', {
+            method: 'PUT',
+            body: JSON.stringify({ month: key, type: 'category', category: cat, value: amount })
+          });
+          await loadBudgetsFromBackend();
+        } catch (err) {
+          console.error('Failed to save category budget to backend:', err);
+          if (!state.budgets[key]) state.budgets[key] = { overall: 0, categories: {} };
+          state.budgets[key].categories[cat] = amount;
+          saveState();
+        }
+      } else {
+        if (!state.budgets[key]) state.budgets[key] = { overall: 0, categories: {} };
+        state.budgets[key].categories[cat] = amount;
+        saveState();
+      }
+
       modal.classList.remove('open');
       refreshBudgets();
     });
   }
 
-  window.removeCategoryBudget = function(cat) {
+  window.removeCategoryBudget = async function(cat) {
     const key = monthKey(state.currentMonth);
-    if (state.budgets[key] && state.budgets[key].categories) {
-      delete state.budgets[key].categories[cat];
+
+    if (API_BASE) {
+      try {
+        await apiFetch('/budgets', {
+          method: 'DELETE',
+          body: JSON.stringify({ month: key, type: 'category', category: cat })
+        });
+        await loadBudgetsFromBackend();
+      } catch (err) {
+        console.error('Failed to delete category budget from backend:', err);
+        if (state.budgets[key] && state.budgets[key].categories) {
+          delete state.budgets[key].categories[cat];
+        }
+        saveState();
+      }
+    } else {
+      if (state.budgets[key] && state.budgets[key].categories) {
+        delete state.budgets[key].categories[cat];
+      }
       saveState();
-      refreshBudgets();
     }
+
+    refreshBudgets();
   };
 
   // ─── 365 Challenge ───
@@ -1230,17 +1358,34 @@
   }
 
   function initChallenge() {
-    document.getElementById('challengeStartBtn').addEventListener('click', () => {
-      state.challenge = {
+    document.getElementById('challengeStartBtn').addEventListener('click', async () => {
+      const newChallenge = {
         startDate: todayStr(),
         savedDays: [],
         withdrawn: false
       };
-      saveState();
+
+      if (API_BASE) {
+        try {
+          await apiFetch('/challenge', {
+            method: 'PUT',
+            body: JSON.stringify(newChallenge)
+          });
+          await loadChallengeFromBackend();
+        } catch (err) {
+          console.error('Failed to start challenge on backend:', err);
+          state.challenge = newChallenge;
+          saveState();
+        }
+      } else {
+        state.challenge = newChallenge;
+        saveState();
+      }
+
       refreshChallenge();
     });
 
-    document.getElementById('challengeMarkBtn').addEventListener('click', () => {
+    document.getElementById('challengeMarkBtn').addEventListener('click', async () => {
       if (!state.challenge) return;
       const startDate = new Date(state.challenge.startDate);
       const today = new Date();
@@ -1250,23 +1395,74 @@
       const currentDay = Math.min(daysSinceStart + 1, 365);
 
       if (!state.challenge.savedDays.includes(currentDay)) {
-        state.challenge.savedDays.push(currentDay);
-        saveState();
+        const updated = {
+          ...state.challenge,
+          savedDays: [...state.challenge.savedDays, currentDay].sort((a,b)=>a-b)
+        };
+
+        if (API_BASE) {
+          try {
+            await apiFetch('/challenge', {
+              method: 'PUT',
+              body: JSON.stringify(updated)
+            });
+            await loadChallengeFromBackend();
+          } catch (err) {
+            console.error('Failed to mark challenge day on backend:', err);
+            state.challenge = updated;
+            saveState();
+          }
+        } else {
+          state.challenge = updated;
+          saveState();
+        }
+
         refreshChallenge();
       }
     });
 
-    document.getElementById('challengeResetBtn').addEventListener('click', () => {
+    document.getElementById('challengeResetBtn').addEventListener('click', async () => {
       if (!confirm('Reset the 365 Challenge? All progress will be lost.')) return;
-      state.challenge = null;
-      saveState();
+
+      if (API_BASE) {
+        try {
+          await apiFetch('/challenge', { method: 'DELETE' });
+          state.challenge = null;
+        } catch (err) {
+          console.error('Failed to reset challenge on backend:', err);
+          state.challenge = null;
+          saveState();
+        }
+      } else {
+        state.challenge = null;
+        saveState();
+      }
+
       refreshChallenge();
     });
 
-    document.getElementById('challengeWithdrawBtn').addEventListener('click', () => {
+    document.getElementById('challengeWithdrawBtn').addEventListener('click', async () => {
       if (!state.challenge) return;
-      state.challenge.withdrawn = true;
-      saveState();
+
+      const updated = { ...state.challenge, withdrawn: true };
+
+      if (API_BASE) {
+        try {
+          await apiFetch('/challenge', {
+            method: 'PUT',
+            body: JSON.stringify(updated)
+          });
+          await loadChallengeFromBackend();
+        } catch (err) {
+          console.error('Failed to mark challenge withdrawn on backend:', err);
+          state.challenge = updated;
+          saveState();
+        }
+      } else {
+        state.challenge = updated;
+        saveState();
+      }
+
       alert('Congratulations! You\'ve completed the 365 Penny Challenge and saved £667.95!');
       refreshChallenge();
     });
@@ -1290,23 +1486,53 @@
   }
 
   function initSettings() {
-    document.getElementById('addExpenseCatBtn').addEventListener('click', () => {
+    document.getElementById('addExpenseCatBtn').addEventListener('click', async () => {
       const input = document.getElementById('newExpenseCat');
       const val = input.value.trim();
       if (val && !state.expenseCategories.includes(val)) {
-        state.expenseCategories.push(val);
-        saveState();
+        if (API_BASE) {
+          try {
+            await apiFetch('/categories', {
+              method: 'POST',
+              body: JSON.stringify({ type: 'expense', name: val })
+            });
+            await loadCategoriesFromBackend();
+          } catch (err) {
+            console.error('Failed to save category to backend:', err);
+            state.expenseCategories.push(val);
+            saveState();
+          }
+        } else {
+          state.expenseCategories.push(val);
+          saveState();
+        }
+
         refreshSettings();
         input.value = '';
       }
     });
 
-    document.getElementById('addIncomeCatBtn').addEventListener('click', () => {
+    document.getElementById('addIncomeCatBtn').addEventListener('click', async () => {
       const input = document.getElementById('newIncomeCat');
       const val = input.value.trim();
       if (val && !state.incomeCategories.includes(val)) {
-        state.incomeCategories.push(val);
-        saveState();
+        if (API_BASE) {
+          try {
+            await apiFetch('/categories', {
+              method: 'POST',
+              body: JSON.stringify({ type: 'income', name: val })
+            });
+            await loadCategoriesFromBackend();
+          } catch (err) {
+            console.error('Failed to save category to backend:', err);
+            state.incomeCategories.push(val);
+            saveState();
+          }
+        } else {
+          state.incomeCategories.push(val);
+          saveState();
+        }
+
         refreshSettings();
         input.value = '';
       }
@@ -1316,9 +1542,22 @@
     document.getElementById('exportAllBtn').addEventListener('click', exportAllJSON);
     document.getElementById('importAllBtn').addEventListener('click', () => document.getElementById('jsonFileInput').click());
     document.getElementById('jsonFileInput').addEventListener('change', importAllJSON);
-    document.getElementById('clearAllBtn').addEventListener('click', () => {
+    document.getElementById('clearAllBtn').addEventListener('click', async () => {
       if (!confirm('This will delete ALL your data. Are you sure?')) return;
-      localStorage.removeItem('budgewise_data');
+
+      if (API_BASE) {
+        try {
+          await apiFetch('/reset', { method: 'POST' });
+          localStorage.removeItem(storageKey);
+          await syncBackendState();
+          refreshSettings();
+          return;
+        } catch (err) {
+          console.error('Failed to clear backend data:', err);
+        }
+      }
+
+      localStorage.removeItem(storageKey);
       state.transactions = [];
       state.expenseCategories = [...DEFAULT_EXPENSE_CATS];
       state.incomeCategories = [...DEFAULT_INCOME_CATS];
@@ -1328,6 +1567,27 @@
       applyTheme(state.theme);
       saveState();
       refreshCurrentTab(getCurrentTab());
+      refreshSettings();
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to log out?')) return;
+      try {
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        if (response.ok) {
+          localStorage.removeItem(storageKey);
+          storageKey = 'budgetwise_data';
+          window.location.href = data.redirect || '/login';
+        } else {
+          alert('Logout failed. Please try again.');
+        }
+      } catch (error) {
+        alert('Logout failed. Please try again.');
+      }
     });
 
     // File System Access — Connect/Disconnect
@@ -1348,21 +1608,39 @@
     document.getElementById('fsDisconnectBtn').addEventListener('click', () => {
       dirHandle = null;
       fsAccessGranted = false;
-      localStorage.removeItem('budgewise_fs_granted');
+      localStorage.removeItem('budgetwise_fs_granted');
       updateFsStatusUI();
     });
   }
 
-  window.removeCategory = function(type, cat) {
-    if (type === 'expense') {
-      state.expenseCategories = state.expenseCategories.filter(c => c !== cat);
+  window.removeCategory = async function(type, cat) {
+    if (API_BASE) {
+      try {
+        await apiFetch('/categories', {
+          method: 'DELETE',
+          body: JSON.stringify({ type, name: cat })
+        });
+        await loadCategoriesFromBackend();
+      } catch (err) {
+        console.error('Failed to delete category from backend:', err);
+        if (type === 'expense') {
+          state.expenseCategories = state.expenseCategories.filter(c => c !== cat);
+        } else {
+          state.incomeCategories = state.incomeCategories.filter(c => c !== cat);
+        }
+        saveState();
+      }
     } else {
-      state.incomeCategories = state.incomeCategories.filter(c => c !== cat);
+      if (type === 'expense') {
+        state.expenseCategories = state.expenseCategories.filter(c => c !== cat);
+      } else {
+        state.incomeCategories = state.incomeCategories.filter(c => c !== cat);
+      }
+      saveState();
     }
-    saveState();
+
     refreshSettings();
   };
-
   // ─── Manual CSV Import/Export (Transactions page) ───
   function initCSV() {
     document.getElementById('exportCsvBtn').addEventListener('click', exportTransCSV);
@@ -1382,7 +1660,7 @@
       csv += `${t.date},${t.type},${escapeCSV(t.category)},${escapeCSV(t.description)},${t.amount.toFixed(2)},${escapeCSV(t.notes || '')}\n`;
     });
 
-    downloadFile(csv, 'budgewise_transactions_export.csv', 'text/csv');
+    downloadFile(csv, 'budgetwise_transactions_export.csv', 'text/csv');
   }
 
   function importTransCSV(e) {
@@ -1453,7 +1731,7 @@
       theme: state.theme,
       exportDate: new Date().toISOString()
     };
-    downloadFile(JSON.stringify(data, null, 2), 'budgewise_backup.json', 'application/json');
+    downloadFile(JSON.stringify(data, null, 2), 'budgetwise_backup.json', 'application/json');
   }
 
   function importAllJSON(e) {
@@ -1515,6 +1793,72 @@
     } catch (err) {
       return null;
     }
+  }
+
+  async function fetchCurrentUser() {
+    if (!API_BASE) return null;
+    try {
+      const response = await fetch(`${API_BASE}/me`);
+      if (!response.ok) return null;
+      return await response.json();
+    } catch (err) {
+      return null;
+    }
+  }
+
+  async function apiFetch(path, options = {}) {
+    if (!API_BASE) {
+      throw new Error('Backend API not available');
+    }
+
+    const commonHeaders = { 'Content-Type': 'application/json' };
+    const response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers: {
+        ...commonHeaders,
+        ...(options.headers || {})
+      }
+    });
+
+    if (!response.ok) {
+      let payload = null;
+      try {
+        payload = await response.json();
+      } catch (ignored) {
+        // ignore
+      }
+      throw new Error((payload && payload.message) || `API error ${response.status}`);
+    }
+
+    if (response.status === 204) {
+      return null;
+    }
+
+    try {
+      return await response.json();
+    } catch (ignored) {
+      return null;
+    }
+  }
+
+  async function syncBackendState() {
+    if (!API_BASE) return;
+
+    await Promise.all([
+      loadTransactionsFromBackend(),
+      loadBudgetsFromBackend(),
+      loadCategoriesFromBackend(),
+      loadSettingsFromBackend(),
+      loadChallengeFromBackend()
+    ]);
+
+    applyTheme(state.theme);
+    refreshCurrentTab(getCurrentTab());
+  }
+
+  function updateStorageKey(user) {
+    const userId = user && (user.user_id || user.id);
+    storageKey = userId ? `budgetwise_data_${userId}` : 'budgetwise_data';
   }
 
   function isDefaultTheme(theme) {
@@ -1707,6 +2051,8 @@ async function loadSettingsFromBackend() {
         card: settings.theme_card || '#ffffff',
         text: settings.theme_text || '#1a1a2e'
       };
+    } else {
+      state.theme = { ...THEME_PRESETS.default };
     }
 
     saveState();
@@ -1734,6 +2080,8 @@ async function loadChallengeFromBackend() {
           .map(Number),
         withdrawn: String(row.Withdrawn || row.withdrawn || '').toLowerCase() === 'true'
       };
+    } else {
+      state.challenge = null;
     }
 
     saveState();
@@ -1747,10 +2095,11 @@ async function loadChallengeFromBackend() {
 
 
 async function init() {
+  const currentUser = await fetchCurrentUser();
+  updateStorageKey(currentUser);
   loadState();
 
   // Try to load data from the backend (if the server is running).
-  // If the backend is not available, fallback to the shipped sample_data CSVs.
   await Promise.all([
     loadTransactionsFromBackend(),
     loadBudgetsFromBackend(),
@@ -1758,8 +2107,6 @@ async function init() {
     loadSettingsFromBackend(),
     loadChallengeFromBackend()
   ]);
-
-  await loadSampleData();
 
   applyTheme(state.theme);
   initNav();
