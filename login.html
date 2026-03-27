@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BudgetWise — Log In</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-shell {
+      min-height: calc(100vh - 56px);
+      display: grid;
+      place-items: center;
+      padding: 32px 16px;
+    }
+
+    .auth-wrap {
+      width: 100%;
+      max-width: 980px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .auth-card {
+      margin-bottom: 0;
+      height: 100%;
+    }
+
+    .auth-hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+      min-height: 100%;
+    }
+
+    .auth-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 6px 10px;
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      background: var(--bg-alt);
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .auth-hero h1 {
+      font-size: 2.2rem;
+      line-height: 1.15;
+      max-width: 12ch;
+    }
+
+    .auth-hero p {
+      color: var(--text-secondary);
+      max-width: 56ch;
+    }
+
+    .auth-highlights {
+      display: grid;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .auth-highlight {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 14px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-alt);
+    }
+
+    .auth-highlight strong {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .auth-highlight span {
+      color: var(--text-secondary);
+      font-size: 0.84rem;
+    }
+
+    .auth-highlight-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .auth-form-card {
+      align-self: center;
+    }
+
+    .auth-form-header {
+      margin-bottom: 18px;
+    }
+
+    .auth-form-header p {
+      color: var(--text-secondary);
+      margin-top: 6px;
+      font-size: 0.92rem;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .auth-form .form-group {
+      margin-bottom: 0;
+    }
+
+    .auth-form input[type="email"],
+    .auth-form input[type="password"] {
+      width: 100%;
+    }
+
+    .auth-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .auth-checkbox {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .auth-checkbox input {
+      accent-color: var(--primary);
+    }
+
+    .auth-link {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .auth-submit {
+      justify-content: center;
+      width: 100%;
+      margin-top: 4px;
+      min-height: 42px;
+    }
+
+    .auth-meta {
+      margin-top: 16px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.87rem;
+    }
+
+    .auth-status {
+      display: none;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      font-size: 0.86rem;
+      border: 1px solid transparent;
+    }
+
+    .auth-status.show {
+      display: block;
+    }
+
+    .auth-status.error {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #991b1b;
+    }
+
+    .auth-status.success {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #065f46;
+    }
+
+    @media (max-width: 860px) {
+      .auth-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-hero h1 {
+        max-width: none;
+        font-size: 1.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="top-bar">
+    <div class="top-bar-inner">
+        <span class="logo-text">BudgetWise</span>
+      <nav class="main-nav"></nav>
+      <a class="btn btn-primary btn-sm" href="/signup">Create account</a>
+    </div>
+  </header>
+
+  <main class="auth-shell">
+    <section class="auth-wrap">
+      <article class="card auth-card auth-hero">
+          <h1>Welcome to BudgetWise.</h1>
+
+        <div class="auth-highlights">
+          <div class="auth-highlight">
+            <span class="auth-highlight-icon">£</span>
+            <div>
+              <strong>See your money clearly</strong>
+              <span>Review transactions, category totals, and monthly progress from one dashboard.</span>
+            </div>
+          </div>
+          <div class="auth-highlight">
+            <span class="auth-highlight-icon">✓</span>
+            <div>
+              <strong>Stay on top of budgets</strong>
+              <span>Keep spending targets visible so you know when you are on track or drifting.</span>
+            </div>
+          </div>
+          <div class="auth-highlight">
+            <span class="auth-highlight-icon">↗</span>
+            <div>
+              <strong>Build better habits</strong>
+              <span>Use BudgetWise as a simple daily check-in rather than another thing to ignore.</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card auth-card auth-form-card">
+        <div class="auth-form-header">
+          <h3>Log in</h3>
+          <p>Enter your details to continue.</p>
+        </div>
+
+        <div id="statusMessage" class="auth-status" role="alert" aria-live="polite"></div>
+
+        <form id="loginForm" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
+          </div>
+
+          <div class="auth-row">
+            <label class="auth-checkbox" for="rememberMe">
+              <input id="rememberMe" name="remember" type="checkbox">
+              <span>Remember me</span>
+            </label>
+          </div>
+
+          <button id="loginButton" type="submit" class="btn btn-primary auth-submit">Log in</button>
+        </form>
+
+        <p class="auth-meta">
+          Do not have an account?
+          <a href="/signup">Create one here</a>
+        </p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const form = document.getElementById('loginForm');
+      const button = document.getElementById('loginButton');
+      const status = document.getElementById('statusMessage');
+
+      function showStatus(message, type) {
+        status.textContent = message;
+        status.className = `auth-status show ${type}`;
+      }
+
+      function clearStatus() {
+        status.textContent = '';
+        status.className = 'auth-status';
+      }
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        clearStatus();
+
+        const formData = new FormData(form);
+        const email = String(formData.get('email') || '').trim();
+        const password = String(formData.get('password') || '');
+        const remember = formData.get('remember') === 'on';
+
+        if (!email || !password) {
+          showStatus('Enter both your email and password.', 'error');
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent = 'Logging in...';
+
+        try {
+          const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, remember })
+          });
+
+          let payload = {};
+          try {
+            payload = await response.json();
+          } catch (err) {
+            payload = {};
+          }
+
+          if (!response.ok) {
+            if (response.status === 404) {
+              throw new Error('The login page is ready, but your Flask backend still needs a POST /api/login route.');
+            }
+            throw new Error(payload.message || 'Login failed. Check your details and try again.');
+          }
+
+          showStatus(payload.message || 'Login successful. Redirecting...', 'success');
+          window.setTimeout(function () {
+            window.location.href = payload.redirect || '/';
+          }, 700);
+        } catch (error) {
+          showStatus(error.message || 'Something went wrong while trying to log in.', 'error');
+        } finally {
+          button.disabled = false;
+          button.textContent = 'Log in';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

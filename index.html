@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BudgeWise — Smart Budget Tracker</title>
+  <title>BudgetWise — Smart Budget Tracker</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
     <div class="top-bar-inner">
       <div class="logo">
         <span class="logo-icon">£</span>
-        <span class="logo-text">BudgeWise</span>
+        <span class="logo-text">BudgetWise</span>
       </div>
       <nav class="main-nav">
         <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
@@ -350,11 +350,11 @@
         <div class="fs-file-list">
           <p class="settings-desc" style="margin-top:12px">When connected, these files are maintained in your chosen folder:</p>
           <ul class="fs-files">
-            <li><code>budgewise_transactions.csv</code> — all income &amp; expense entries</li>
-            <li><code>budgewise_budgets.csv</code> — monthly spending targets</li>
-            <li><code>budgewise_challenge.csv</code> — 365 penny challenge progress</li>
-            <li><code>budgewise_categories.csv</code> — custom categories</li>
-            <li><code>budgewise_settings.csv</code> — theme preferences</li>
+            <li><code>budgetwise_transactions.csv</code> — all income &amp; expense entries</li>
+            <li><code>budgetwise_budgets.csv</code> — monthly spending targets</li>
+            <li><code>budgetwise_challenge.csv</code> — 365 penny challenge progress</li>
+            <li><code>budgetwise_categories.csv</code> — custom categories</li>
+            <li><code>budgetwise_settings.csv</code> — theme preferences</li>
           </ul>
         </div>
       </div>
@@ -366,6 +366,7 @@
           <button class="btn" id="importAllBtn">Import Data (JSON)</button>
           <input type="file" id="jsonFileInput" accept=".json" style="display:none">
           <button class="btn btn-danger" id="clearAllBtn">Clear All Data</button>
+          <button class="btn btn-secondary" id="logoutBtn">Log Out</button>
         </div>
       </div>
     </section>
@@ -453,7 +454,7 @@
         <span class="tip-icon">💡</span>
         <span class="tip-text" id="savingTip">Loading tip...</span>
       </div>
-      <div class="footer-copy">&copy; 2026 BudgeWise. Your money, your control.</div>
+      <div class="footer-copy">&copy; 2026 BudgetWise. Your money, your control.</div>
     </div>
   </footer>
 
